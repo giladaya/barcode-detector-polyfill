@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>BarcodeDetector Polyfill Example</title>
+  </head>
+  <body>
+    <img id="theImage"/>
+    <div id="output">...</div>
+  </body>
+  <script src="../BarcodeDetector.min.js"></script>
+  <script>
+    var $img = document.getElementById('theImage');
+    var $output = document.getElementById('output');
+
+    var imgUrl = '2007001523239-01_N95-2592x1944_scaledTo800x600bilinear.jpg';
+    var barcodeDetector = new BarcodeDetector();
+
+    // img.crossOrigin = "No CORS";
+    $img.onload = function() {
+      barcodeDetector.detect($img).then(results => {
+        str = results.map(function (res) {
+          return res.rawValue
+        }).join(', ');
+        $output.innerHTML = str;
+        console.log(results)
+      });
+    }
+    $img.src = imgUrl
+  </script>
+</html>

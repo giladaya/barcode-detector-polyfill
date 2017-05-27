@@ -1,0 +1,52 @@
+{
+  "name": "barcode-detector-polyfill",
+  "version": "0.1.0",
+  "description": "polyfill for BarcodeDetector",
+  "main": "dist/BarcodeDetector.js",
+  "scripts": {
+    "build": "webpack --env build && cp dist/BarcodeDetector.min.js examples/",
+    "dev": "webpack --progress --colors --watch --env dev",
+    "gh-pages": "npm run build && node_modules/gh-pages/bin/gh-pages -d examples"
+  },
+  "devDependencies": {
+    "babel-cli": "6.24.1",
+    "babel-core": "6.24.1",
+    "babel-eslint": "7.2.3",
+    "babel-loader": "7.0.0",
+    "babel-plugin-add-module-exports": "0.2.1",
+    "babel-preset-es2015": "6.24.1",
+    "chai": "3.5.0",
+    "eslint": "3.19.0",
+    "eslint-loader": "1.7.1",
+    "mocha": "3.3.0",
+    "webpack": "2.4.1",
+    "worker-loader": "^0.8.0",
+    "yargs": "7.1.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/giladaya/barcode-detector-polyfill.git"
+  },
+  "keywords": [
+    "webworker",
+    "webpack",
+    "es6",
+    "starter",
+    "library",
+    "universal",
+    "umd",
+    "commonjs",
+    "shape detect",
+    "barcode",
+    "polyfill"
+  ],
+  "author": "Gilad Dayagi",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/giladaya/barcode-detector-polyfill/issues"
+  },
+  "homepage": "https://github.com/giladaya/barcode-detector-polyfill",
+  "dependencies": {
+    "gh-pages": "^1.0.0"
+  }
+}
