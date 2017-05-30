@@ -45,5 +45,8 @@ if (BarcodeDetector in window) {
 }
 ```
 
-### Examples
+## Examples
 See the examples folder, or [live demo](https://giladaya.github.io/barcode-detector-polyfill/)
+
+## Browser support
+Requires Promises (can also be [polyfilled](https://github.com/stefanpenner/es6-promise)) and typed arrays which are [supported in all modern browsers](http://caniuse.com/#feat=typedarrays), down to IE11.
