@@ -15,14 +15,30 @@ bower install barcode-detector-polyfill
 
 Use:
 ```
-<script src="bower_components/barcode-detector-polyfill/BarcodeDetector.min.js"></script>
 <script>
-  if (! (BarcodeDetector in window)) {
-    window.BarcodeDetector = BarcodeDetector
-  }
-  var barcodeDetector = new BarcodeDetector();
+  (function () {
+    function loadScript(src, done) {
+      var $script = document.createElement('script');
+      $script.src = src;
+      $script.onload = function() {
+        done();
+      };
+      $script.onerror = function() {
+        done(new Error('Failed to load script ' + src));
+      };
+      document.head.appendChild($script);
+    }
+    if (BarcodeDetector in window) {
+      ContinueToStartTheApp();
+    } else {
+      loadScript(
+        "bower_components/barcode-detector-polyfill/BarcodeDetector.min.js", 
+        ContinueToStartTheApp
+      );
+    }
+  })()
+  // ...
 </script>
-...
 ```
 
 ### With webpack
