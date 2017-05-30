@@ -1,6 +1,6 @@
 {
   "name": "barcode-detector-polyfill",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Polyfill for BarcodeDetector API",
   "main": "dist/BarcodeDetector.js",
   "scripts": {
