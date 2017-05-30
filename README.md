@@ -29,11 +29,11 @@ Use:
       document.head.appendChild($script);
     }
     if (BarcodeDetector in window) {
-      ContinueToStartTheApp();
+      continueToStartTheApp();
     } else {
       loadScript(
         "bower_components/barcode-detector-polyfill/BarcodeDetector.min.js", 
-        ContinueToStartTheApp
+        continueToStartTheApp
       );
     }
   })()
@@ -49,17 +49,20 @@ npm install --save barcode-detector-polyfill
 
 Use:
 ```
-if (BarcodeDetector in window) {
-  ContinueToStartTheApp();
+if ('BarcodeDetector' in window) {
+  continueToStartTheApp();
 } else {
-  import('BarcodeDetector').then(function(BarcodeDetector) {
+  require.ensure(['barcode-detector-polyfill'], function(require) {
+    const BarcodeDetector = require('barcode-detector-polyfill');
     window.BarcodeDetector = BarcodeDetector;
-    ContinueToStartTheApp();
-  }).catch(function(err) {
+    continueToStartTheApp();
+  }, function(err) {
     console.log('Failed to load BarcodeDetector', err);
   });
 }
 ```
+
+See [demo](https://www.webpackbin.com/bins/-KlO--0RBOGYZXP0wyrl)
 
 ## Examples
 See the examples folder, or [live demo](https://giladaya.github.io/barcode-detector-polyfill/)
