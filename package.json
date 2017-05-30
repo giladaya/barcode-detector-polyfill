@@ -4,7 +4,7 @@
   "description": "polyfill for BarcodeDetector",
   "main": "dist/BarcodeDetector.js",
   "scripts": {
-    "build": "webpack --env build && cp dist/BarcodeDetector.min.js examples/",
+    "build": "rm -rf dist/* && webpack && webpack --env build && cp dist/BarcodeDetector.min.js examples/",
     "dev": "webpack --progress --colors --watch --env dev",
     "gh-pages": "npm run build && node_modules/gh-pages/bin/gh-pages -d examples"
   },
