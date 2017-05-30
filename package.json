@@ -1,6 +1,6 @@
 {
   "name": "barcode-detector-polyfill",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Polyfill for BarcodeDetector API",
   "main": "dist/BarcodeDetector.js",
   "scripts": {
@@ -46,6 +46,5 @@
     "url": "https://github.com/giladaya/barcode-detector-polyfill/issues"
   },
   "homepage": "https://github.com/giladaya/barcode-detector-polyfill",
-  "dependencies": {
-  }
+  "dependencies": {}
 }
