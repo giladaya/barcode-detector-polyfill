@@ -36,8 +36,8 @@ const config = {
     path: path.join(__dirname, "dist"),
     filename: outputFile,
     library: [libraryName],
-    libraryTarget: 'umd'
-    //umdNamedDefine: true
+    libraryTarget: 'umd',
+    umdNamedDefine: true
   },
   module: {
     rules: [
