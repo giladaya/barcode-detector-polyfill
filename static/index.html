@@ -9,24 +9,54 @@
     <img id="theImage"/>
     <div id="output">...</div>
   </body>
-  <script src="../BarcodeDetector.min.js"></script>
   <script>
-    var $img = document.getElementById('theImage');
-    var $output = document.getElementById('output');
+    // window.BarcodeDetector = function() {
+    //   return {
+    //     detect: function() {return Promise.resolve([])}
+    //   }
+    // }
+  </script>
+  <script>
+    (function () {
+      function loadScript(src, done) {
+        var $script = document.createElement('script');
+        $script.src = src;
+        $script.onload = function() {
+          done();
+        };
+        $script.onerror = function() {
+          done(new Error('Failed to load script ' + src));
+        };
+        document.head.appendChild($script);
+      }
+      if ('BarcodeDetector' in window) {
+        startTheApp();
+      } else {
+        loadScript(
+          "../BarcodeDetector.min.js", 
+          startTheApp
+        );
+      }
+    })()
 
-    var imgUrl = '2007001523239-01_N95-2592x1944_scaledTo800x600bilinear.jpg';
-    var barcodeDetector = new BarcodeDetector();
+    function startTheApp() {
+      var $img = document.getElementById('theImage');
+      var $output = document.getElementById('output');
 
-    // img.crossOrigin = "No CORS";
-    $img.onload = function() {
-      barcodeDetector.detect($img).then(results => {
-        str = results.map(function (res) {
-          return res.rawValue
-        }).join(', ');
-        $output.innerHTML = str;
-        console.log(results)
-      });
+      var imgUrl = '2007001523239-01_N95-2592x1944_scaledTo800x600bilinear.jpg';
+      var barcodeDetector = new BarcodeDetector();
+
+      // img.crossOrigin = "No CORS";
+      $img.onload = function() {
+        barcodeDetector.detect($img).then(results => {
+          str = results.map(function (res) {
+            return res.rawValue
+          }).join(', ');
+          $output.innerHTML = str;
+          console.log(results)
+        });
+      }
+      $img.src = imgUrl
     }
-    $img.src = imgUrl
   </script>
 </html>

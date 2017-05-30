@@ -12,79 +12,103 @@
       <canvas width="320" height="240" id="picture"></canvas>
       <p id="textbit"></p>
     </div>
-    <script src="../BarcodeDetector.min.js"></script>
     <script type="text/javascript">
-      var takePicture = document.querySelector("#Take-Picture"),
-      showPicture = document.createElement("img");
-      Result = document.querySelector("#textbit");
-      var canvas =document.getElementById("picture");
-      var ctx = canvas.getContext("2d");
-
-      if (window.BarcodeDetector == undefined) {
-        window.BarcodeDetector = BarcodeDetector;
-      }
-      var barcodeDetector = new BarcodeDetector();
-
-      function handleResults (result) {
-        if (result.length > 0){
-          ctx.beginPath();
-          ctx.lineWIdth = "2";
-          ctx.strokeStyle="red";
-          var tempArray = [];
-          for(var i = 0; i < result.length; i++) {
-            tempArray.push(result[i].rawValue);
-            ctx.rect(
-              result[i].boundingBox.x, 
-              result[i].boundingBox.y, 
-              result[i].boundingBox.width, 
-              result[i].boundingBox.height
-            );
-          }
-          Result.innerHTML = tempArray.join("<br />");
-          ctx.stroke();
+      (function () {
+        function loadScript(src, done) {
+          var $script = document.createElement('script');
+          $script.src = src;
+          $script.onload = function() {
+            done();
+          };
+          $script.onerror = function() {
+            done(new Error('Failed to load script ' + src));
+          };
+          document.head.appendChild($script);
+        }
+        if ('BarcodeDetector' in window) {
+          startTheApp();
         } else {
-          if(result.length === 0) {
-            Result.innerHTML = "Decoding failed.";
+          console.log('Loading polyfill');
+          loadScript(
+            "../BarcodeDetector.min.js", 
+            startTheApp
+          );
+        }
+      })()
+
+      function startTheApp() {
+        var takePicture = document.querySelector("#Take-Picture"),
+        showPicture = document.createElement("img");
+        Result = document.querySelector("#textbit");
+        var canvas =document.getElementById("picture");
+        var ctx = canvas.getContext("2d");
+
+        if (window.BarcodeDetector == undefined) {
+          window.BarcodeDetector = BarcodeDetector;
+        }
+        var barcodeDetector = new BarcodeDetector();
+
+        function handleResults (result) {
+          if (result.length > 0){
+            ctx.beginPath();
+            ctx.lineWIdth = "2";
+            ctx.strokeStyle="red";
+            var tempArray = [];
+            for (var i = 0; i < result.length; i++) {
+              tempArray.push(result[i].rawValue);
+              ctx.rect(
+                result[i].boundingBox.x, 
+                result[i].boundingBox.y, 
+                result[i].boundingBox.width, 
+                result[i].boundingBox.height
+              );
+            }
+            Result.innerHTML = tempArray.join("<br />");
+            ctx.stroke();
+          } else {
+            if(result.length === 0) {
+              Result.innerHTML = "Decoding failed.";
+            }
           }
         }
-      }
 
-      if(takePicture && showPicture) {
-        takePicture.onchange = function (event) {
-          var files = event.target.files;
-          if (files && files.length > 0) {
-            file = files[0];
-            try {
-              var URL = window.URL || window.webkitURL;
-              showPicture.onload = function(event) {
-                Result.innerHTML="";
-                // JOB.DecodeImage(showPicture);
-                ctx.drawImage(showPicture, 0, 0, canvas.width, canvas.height);
-                barcodeDetector.detect(showPicture).then(handleResults)
-                URL.revokeObjectURL(showPicture.src);
-              };
-              showPicture.src = URL.createObjectURL(file);
-            }
-            catch (e) {
+        if (takePicture && showPicture) {
+          takePicture.onchange = function (event) {
+            var files = event.target.files;
+            if (files && files.length > 0) {
+              file = files[0];
               try {
-                var fileReader = new FileReader();
-                fileReader.onload = function (event) {
-                  showPicture.onload = function(event) {
-                    Result.innerHTML="";
-                    ctx.drawImage(showPicture, 0, 0, canvas.width, canvas.height);
-                    // JOB.DecodeImage(showPicture);
-                    barcodeDetector.detect(showPicture).then(handleResults)
-                  };
-                  showPicture.src = event.target.result;
+                var URL = window.URL || window.webkitURL;
+                showPicture.onload = function(event) {
+                  Result.innerHTML="";
+                  // JOB.DecodeImage(showPicture);
+                  ctx.drawImage(showPicture, 0, 0, canvas.width, canvas.height);
+                  barcodeDetector.detect(showPicture).then(handleResults)
+                  URL.revokeObjectURL(showPicture.src);
                 };
-                fileReader.readAsDataURL(file);
+                showPicture.src = URL.createObjectURL(file);
               }
               catch (e) {
-                Result.innerHTML = "Neither createObjectURL or FileReader are supported";
+                try {
+                  var fileReader = new FileReader();
+                  fileReader.onload = function (event) {
+                    showPicture.onload = function(event) {
+                      Result.innerHTML="";
+                      ctx.drawImage(showPicture, 0, 0, canvas.width, canvas.height);
+                      // JOB.DecodeImage(showPicture);
+                      barcodeDetector.detect(showPicture).then(handleResults)
+                    };
+                    showPicture.src = event.target.result;
+                  };
+                  fileReader.readAsDataURL(file);
+                }
+                catch (e) {
+                  Result.innerHTML = "Neither createObjectURL or FileReader are supported";
+                }
               }
             }
-          }
-        };
+          };
+        }
       }
     </script>
   </body>
