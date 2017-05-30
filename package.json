@@ -1,7 +1,7 @@
 {
   "name": "barcode-detector-polyfill",
   "version": "0.1.0",
-  "description": "polyfill for BarcodeDetector",
+  "description": "Polyfill for BarcodeDetector API",
   "main": "dist/BarcodeDetector.js",
   "scripts": {
     "build": "rm -rf dist/* && webpack && webpack --env build && cp dist/BarcodeDetector.min.js examples/",
@@ -21,24 +21,24 @@
     "mocha": "3.3.0",
     "webpack": "2.4.1",
     "worker-loader": "^0.8.0",
-    "yargs": "7.1.0"
+    "yargs": "7.1.0",
+    "gh-pages": "^1.0.0"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/giladaya/barcode-detector-polyfill.git"
   },
   "keywords": [
+    "shape detect",
+    "barcode",
+    "polyfill",
     "webworker",
     "webpack",
     "es6",
-    "starter",
     "library",
     "universal",
     "umd",
-    "commonjs",
-    "shape detect",
-    "barcode",
-    "polyfill"
+    "commonjs"
   ],
   "author": "Gilad Dayagi",
   "license": "MIT",
@@ -47,6 +47,5 @@
   },
   "homepage": "https://github.com/giladaya/barcode-detector-polyfill",
   "dependencies": {
-    "gh-pages": "^1.0.0"
   }
 }

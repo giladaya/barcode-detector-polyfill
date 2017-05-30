@@ -30,14 +30,14 @@ if (env === 'build') {
 }
 
 const config = {
-  entry: __dirname + '/src/index.js',
+  entry: __dirname + '/src/index',
   devtool: 'source-map',
   output: {
-    path: __dirname + '/dist',
+    path: path.join(__dirname, "dist"),
     filename: outputFile,
-    library: libraryName,
-    libraryTarget: 'umd',
-    umdNamedDefine: true
+    library: [libraryName],
+    libraryTarget: 'umd'
+    //umdNamedDefine: true
   },
   module: {
     rules: [
