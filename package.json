@@ -6,7 +6,7 @@
   "scripts": {
     "build": "rm -rf dist/* && webpack && webpack --env build && cp dist/BarcodeDetector.min.js examples/",
     "dev": "webpack --progress --colors --watch --env dev",
-    "gh-pages": "npm run build && node_modules/gh-pages/bin/gh-pages -d examples"
+    "gh-pages": "gh-pages -d examples"
   },
   "devDependencies": {
     "babel-cli": "6.24.1",
