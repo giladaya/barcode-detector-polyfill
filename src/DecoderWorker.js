@@ -1,7 +1,7 @@
-/* eslint-disable */
-
 /* --------------------------------------------------
-Javascript Only Barcode_Reader (BarcodeReader) V1.6 by Eddie Larsson <https://github.com/EddieLa/BarcodeReader>
+Hybrid ES2015/ESLint'ed fork of Javascript Only Barcode_Reader
+
+Original JOB sourcecode by Eddie Larsson <https://github.com/EddieLa/BarcodeReader>
 
 This software is provided under the MIT license, http://opensource.org/licenses/MIT.
 All use of this software must include this
@@ -12,7 +12,7 @@ use of this software.
 Copyright (c) 2013 Eddie Larsson
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
+of this software and associated documentation files (the 'Software'), to deal
 in the Software without restriction, including without limitation the rights
 to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 copies of the Software, and to permit persons to whom the Software is
@@ -21,7 +21,7 @@ furnished to do so, subject to the following conditions:
 The above copyright notice and this permission notice shall be included in
 all copies or substantial portions of the Software.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
@@ -31,14 +31,1177 @@ THE SOFTWARE.
 
 ------------------------ */
 
-const availableFormats = ["Code128", "Code93", "Code39", "EAN-13", "2Of5", "Inter2Of5", "Codabar"];
+const availableFormats = [
+  'Code128',
+  'Code93',
+  'Code39',
+  'EAN-13',
+  '2Of5',
+  'Inter2Of5',
+  'Codabar'
+];
+
+const TwoOfFiveEncoding = [
+  '00110',
+  '10001',
+  '01001',
+  '11000',
+  '00101',
+  '10100',
+  '01100',
+  '00011',
+  '10010',
+  '01010'
+];
+
+const Code128Encoding = {
+  '212222': {
+    A: ' ',
+    B: ' ',
+    C: '00'
+  },
+  '222122': {
+    A: '!',
+    B: '!',
+    C: '01'
+  },
+  '222221': {
+    A: '\'',
+    B: '\'',
+    C: '02'
+  },
+  '121223': {
+    A: '#',
+    B: '#',
+    C: '03'
+  },
+  '121322': {
+    A: '$',
+    B: '$',
+    C: '04'
+  },
+  '131222': {
+    A: '%',
+    B: '%',
+    C: '05'
+  },
+  '122213': {
+    A: '&',
+    B: '&',
+    C: '06'
+  },
+  '122312': {
+    A: '\'',
+    B: '\'',
+    C: '07'
+  },
+  '132212': {
+    A: '(',
+    B: '(',
+    C: '08'
+  },
+  '221213': {
+    A: ')',
+    B: ')',
+    C: '09'
+  },
+  '221312': {
+    A: '*',
+    B: '*',
+    C: '10'
+  },
+  '231212': {
+    A: '+',
+    B: '+',
+    C: '11'
+  },
+  '112232': {
+    A: ',',
+    B: ',',
+    C: '12'
+  },
+  '122132': {
+    A: '-',
+    B: '-',
+    C: '13'
+  },
+  '122231': {
+    A: '.',
+    B: '.',
+    C: '14'
+  },
+  '113222': {
+    A: '/',
+    B: '/',
+    C: '15'
+  },
+  '123122': {
+    A: '0',
+    B: '0',
+    C: '16'
+  },
+  '123221': {
+    A: '1',
+    B: '1',
+    C: '17'
+  },
+  '223211': {
+    A: '2',
+    B: '2',
+    C: '18'
+  },
+  '221132': {
+    A: '3',
+    B: '3',
+    C: '19'
+  },
+  '221231': {
+    A: '4',
+    B: '4',
+    C: '20'
+  },
+  '213212': {
+    A: '5',
+    B: '5',
+    C: '21'
+  },
+  '223112': {
+    A: '6',
+    B: '6',
+    C: '22'
+  },
+  '312131': {
+    A: '7',
+    B: '7',
+    C: '23'
+  },
+  '311222': {
+    A: '8',
+    B: '8',
+    C: '24'
+  },
+  '321122': {
+    A: '9',
+    B: '9',
+    C: '25'
+  },
+  '321221': {
+    A: ':',
+    B: ':',
+    C: '26'
+  },
+  '312212': {
+    A: ';',
+    B: ';',
+    C: '27'
+  },
+  '322112': {
+    A: '<',
+    B: '<',
+    C: '28'
+  },
+  '322211': {
+    A: '=',
+    B: '=',
+    C: '29'
+  },
+  '212123': {
+    A: '>',
+    B: '>',
+    C: '30'
+  },
+  '212321': {
+    A: '?',
+    B: '?',
+    C: '31'
+  },
+  '232121': {
+    A: '@',
+    B: '@',
+    C: '32'
+  },
+  '111323': {
+    A: 'A',
+    B: 'A',
+    C: '33'
+  },
+  '131123': {
+    A: 'B',
+    B: 'B',
+    C: '34'
+  },
+  '131321': {
+    A: 'C',
+    B: 'C',
+    C: '35'
+  },
+  '112313': {
+    A: 'D',
+    B: 'D',
+    C: '36'
+  },
+  '132113': {
+    A: 'E',
+    B: 'E',
+    C: '37'
+  },
+  '132311': {
+    A: 'F',
+    B: 'F',
+    C: '38'
+  },
+  '211313': {
+    A: 'G',
+    B: 'G',
+    C: '39'
+  },
+  '231113': {
+    A: 'H',
+    B: 'H',
+    C: '40'
+  },
+  '231311': {
+    A: 'I',
+    B: 'I',
+    C: '41'
+  },
+  '112133': {
+    A: 'J',
+    B: 'J',
+    C: '42'
+  },
+  '112331': {
+    A: 'K',
+    B: 'K',
+    C: '43'
+  },
+  '132131': {
+    A: 'L',
+    B: 'L',
+    C: '44'
+  },
+  '113123': {
+    A: 'M',
+    B: 'M',
+    C: '45'
+  },
+  '113321': {
+    A: 'N',
+    B: 'N',
+    C: '46'
+  },
+  '133121': {
+    A: 'O',
+    B: 'O',
+    C: '47'
+  },
+  '313121': {
+    A: 'P',
+    B: 'P',
+    C: '48'
+  },
+  '211331': {
+    A: 'Q',
+    B: 'Q',
+    C: '49'
+  },
+  '231131': {
+    A: 'R',
+    B: 'R',
+    C: '50'
+  },
+  '213113': {
+    A: 'S',
+    B: 'S',
+    C: '51'
+  },
+  '213311': {
+    A: 'T',
+    B: 'T',
+    C: '52'
+  },
+  '213131': {
+    A: 'U',
+    B: 'U',
+    C: '53'
+  },
+  '311123': {
+    A: 'V',
+    B: 'V',
+    C: '54'
+  },
+  '311321': {
+    A: 'W',
+    B: 'W',
+    C: '55'
+  },
+  '331121': {
+    A: 'X',
+    B: 'X',
+    C: '56'
+  },
+  '312113': {
+    A: 'Y',
+    B: 'Y',
+    C: '57'
+  },
+  '312311': {
+    A: 'Z',
+    B: 'Z',
+    C: '58'
+  },
+  '332111': {
+    A: '[',
+    B: '[',
+    C: '59'
+  },
+  '314111': {
+    A: '\\',
+    B: '\\',
+    C: '60'
+  },
+  '221411': {
+    A: ']',
+    B: ']',
+    C: '61'
+  },
+  '431111': {
+    A: '^',
+    B: '^',
+    C: '62'
+  },
+  '111224': {
+    A: '_',
+    B: '_',
+    C: '63'
+  },
+  '111422': {
+    A: 'NUL',
+    B: '`',
+    C: '64'
+  },
+  '121124': {
+    A: 'SOH',
+    B: 'a',
+    C: '65'
+  },
+  '121421': {
+    A: 'STX',
+    B: 'b',
+    C: '66'
+  },
+  '141122': {
+    A: 'ETX',
+    B: 'c',
+    C: '67'
+  },
+  '141221': {
+    A: 'EOT',
+    B: 'd',
+    C: '68'
+  },
+  '112214': {
+    A: 'ENQ',
+    B: 'e',
+    C: '69'
+  },
+  '112412': {
+    A: 'ACK',
+    B: 'f',
+    C: '70'
+  },
+  '122114': {
+    A: 'BEL',
+    B: 'g',
+    C: '71'
+  },
+  '122411': {
+    A: 'BS',
+    B: 'h',
+    C: '72'
+  },
+  '142112': {
+    A: 'HT',
+    B: 'i',
+    C: '73'
+  },
+  '142211': {
+    A: 'LF',
+    B: 'j',
+    C: '74'
+  },
+  '241211': {
+    A: 'VT',
+    B: 'k',
+    C: '75'
+  },
+  '221114': {
+    A: 'FF',
+    B: 'l',
+    C: '76'
+  },
+  '413111': {
+    A: 'CR',
+    B: 'm',
+    C: '77'
+  },
+  '241112': {
+    A: 'SO',
+    B: 'n',
+    C: '78'
+  },
+  '134111': {
+    A: 'SI',
+    B: 'o',
+    C: '79'
+  },
+  '111242': {
+    A: 'DLE',
+    B: 'p',
+    C: '80'
+  },
+  '121142': {
+    A: 'DC1',
+    B: 'q',
+    C: '81'
+  },
+  '121241': {
+    A: 'DC2',
+    B: 'r',
+    C: '82'
+  },
+  '114212': {
+    A: 'DC3',
+    B: 's',
+    C: '83'
+  },
+  '124112': {
+    A: 'DC4',
+    B: 't',
+    C: '84'
+  },
+  '124211': {
+    A: 'NAK',
+    B: 'u',
+    C: '85'
+  },
+  '411212': {
+    A: 'SYN',
+    B: 'v',
+    C: '86'
+  },
+  '421112': {
+    A: 'ETB',
+    B: 'w',
+    C: '87'
+  },
+  '421211': {
+    A: 'CAN',
+    B: 'x',
+    C: '88'
+  },
+  '212141': {
+    A: 'EM',
+    B: 'y',
+    C: '89'
+  },
+  '214121': {
+    A: 'SUB',
+    B: 'z',
+    C: '90'
+  },
+  '412121': {
+    A: 'ESC',
+    B: '{',
+    C: '91'
+  },
+  '111143': {
+    A: 'FS',
+    B: '|',
+    C: '92'
+  },
+  '111341': {
+    A: 'GS',
+    B: '}',
+    C: '93'
+  },
+  '131141': {
+    A: 'RS',
+    B: '~',
+    C: '94'
+  },
+  '114113': {
+    A: 'US',
+    B: 'DEL',
+    C: '95'
+  },
+  '114311': {
+    A: 'FNC3',
+    B: 'FNC3',
+    C: '96'
+  },
+  '411113': {
+    A: 'FNC2',
+    B: 'FNC2',
+    C: '97'
+  },
+  '411311': {
+    A: 'SHIFT_B',
+    B: 'SHIFT_A',
+    C: '98'
+  },
+  '113141': {
+    A: 'Code_C',
+    B: 'Code_C',
+    C: '99'
+  },
+  '114131': {
+    A: 'Code_B',
+    B: 'FNC4',
+    C: 'Code_B'
+  },
+  '311141': {
+    A: 'FNC4',
+    B: 'Code_A',
+    C: 'Code_A'
+  },
+  '411131': {
+    A: 'FNC1',
+    B: 'FNC1',
+    C: 'FNC1'
+  },
+  '211412': 'A',
+  '211214': 'B',
+  '211232': 'C',
+  '233111': {
+    A: 'STOP',
+    B: 'STOP',
+    C: 'STOP'
+  },
+  value: [
+    '212222',
+    '222122',
+    '222221',
+    '121223',
+    '121322',
+    '131222',
+    '122213',
+    '122312',
+    '132212',
+    '221213',
+    '221312',
+    '231212',
+    '112232',
+    '122132',
+    '122231',
+    '113222',
+    '123122',
+    '123221',
+    '223211',
+    '221132',
+    '221231',
+    '213212',
+    '223112',
+    '312131',
+    '311222',
+    '321122',
+    '321221',
+    '312212',
+    '322112',
+    '322211',
+    '212123',
+    '212321',
+    '232121',
+    '111323',
+    '131123',
+    '131321',
+    '112313',
+    '132113',
+    '132311',
+    '211313',
+    '231113',
+    '231311',
+    '112133',
+    '112331',
+    '132131',
+    '113123',
+    '113321',
+    '133121',
+    '313121',
+    '211331',
+    '231131',
+    '213113',
+    '213311',
+    '213131',
+    '311123',
+    '311321',
+    '331121',
+    '312113',
+    '312311',
+    '332111',
+    '314111',
+    '221411',
+    '431111',
+    '111224',
+    '111422',
+    '121124',
+    '121421',
+    '141122',
+    '141221',
+    '112214',
+    '112412',
+    '122114',
+    '122411',
+    '142112',
+    '142211',
+    '241211',
+    '221114',
+    '413111',
+    '241112',
+    '134111',
+    '111242',
+    '121142',
+    '121241',
+    '114212',
+    '124112',
+    '124211',
+    '411212',
+    '421112',
+    '421211',
+    '212141',
+    '214121',
+    '412121',
+    '111143',
+    '111341',
+    '131141',
+    '114113',
+    '114311',
+    '411113',
+    '411311',
+    '113141',
+    '114131',
+    '311141',
+    '411131',
+    '211412',
+    '211214',
+    '211232',
+    '233111'
+  ]
+};
+
+const Code93Encoding = {
+  '131112': {
+    value: 0,
+    character: '0'
+  },
+  '111213': {
+    value: 1,
+    character: '1'
+  },
+  '111312': {
+    value: 2,
+    character: '2'
+  },
+  '111411': {
+    value: 3,
+    character: '3'
+  },
+  '121113': {
+    value: 4,
+    character: '4'
+  },
+  '121212': {
+    value: 5,
+    character: '5'
+  },
+  '121311': {
+    value: 6,
+    character: '6'
+  },
+  '111114': {
+    value: 7,
+    character: '7'
+  },
+  '131211': {
+    value: 8,
+    character: '8'
+  },
+  '141111': {
+    value: 9,
+    character: '9'
+  },
+  '211113': {
+    value: 10,
+    character: 'A'
+  },
+  '211212': {
+    value: 11,
+    character: 'B'
+  },
+  '211311': {
+    value: 12,
+    character: 'C'
+  },
+  '221112': {
+    value: 13,
+    character: 'D'
+  },
+  '221211': {
+    value: 14,
+    character: 'E'
+  },
+  '231111': {
+    value: 15,
+    character: 'F'
+  },
+  '112113': {
+    value: 16,
+    character: 'G'
+  },
+  '112212': {
+    value: 17,
+    character: 'H'
+  },
+  '112311': {
+    value: 18,
+    character: 'I'
+  },
+  '122112': {
+    value: 19,
+    character: 'J'
+  },
+  '132111': {
+    value: 20,
+    character: 'K'
+  },
+  '111123': {
+    value: 21,
+    character: 'L'
+  },
+  '111222': {
+    value: 22,
+    character: 'M'
+  },
+  '111321': {
+    value: 23,
+    character: 'N'
+  },
+  '121122': {
+    value: 24,
+    character: 'O'
+  },
+  '131121': {
+    value: 25,
+    character: 'P'
+  },
+  '212112': {
+    value: 26,
+    character: 'Q'
+  },
+  '212211': {
+    value: 27,
+    character: 'R'
+  },
+  '211122': {
+    value: 28,
+    character: 'S'
+  },
+  '211221': {
+    value: 29,
+    character: 'T'
+  },
+  '221121': {
+    value: 30,
+    character: 'U'
+  },
+  '222111': {
+    value: 31,
+    character: 'V'
+  },
+  '112122': {
+    value: 32,
+    character: 'W'
+  },
+  '112221': {
+    value: 33,
+    character: 'X'
+  },
+  '122121': {
+    value: 34,
+    character: 'Y'
+  },
+  '123111': {
+    value: 35,
+    character: 'Z'
+  },
+  '121131': {
+    value: 36,
+    character: '-'
+  },
+  '311112': {
+    value: 37,
+    character: '.'
+  },
+  '311211': {
+    value: 38,
+    character: ' '
+  },
+  '321111': {
+    value: 39,
+    character: '$'
+  },
+  '112131': {
+    value: 40,
+    character: '/'
+  },
+  '113121': {
+    value: 41,
+    character: '+'
+  },
+  '211131': {
+    value: 42,
+    character: '%'
+  },
+  '121221': {
+    value: 43,
+    character: '($)'
+  },
+  '312111': {
+    value: 44,
+    character: '(%)'
+  },
+  '311121': {
+    value: 45,
+    character: '(/)'
+  },
+  '122211': {
+    value: 46,
+    character: '(+)'
+  },
+  '111141': {
+    value: -1,
+    character: '*'
+  }
+};
+
+const Code39Encoding = {
+  '111221211': {
+    value: 0,
+    character: '0'
+  },
+  '211211112': {
+    value: 1,
+    character: '1'
+  },
+  '112211112': {
+    value: 2,
+    character: '2'
+  },
+  '212211111': {
+    value: 3,
+    character: '3'
+  },
+  '111221112': {
+    value: 4,
+    character: '4'
+  },
+  '211221111': {
+    value: 5,
+    character: '5'
+  },
+  '112221111': {
+    value: 6,
+    character: '6'
+  },
+  '111211212': {
+    value: 7,
+    character: '7'
+  },
+  '211211211': {
+    value: 8,
+    character: '8'
+  },
+  '112211211': {
+    value: 9,
+    character: '9'
+  },
+  '211112112': {
+    value: 10,
+    character: 'A'
+  },
+  '112112112': {
+    value: 11,
+    character: 'B'
+  },
+  '212112111': {
+    value: 12,
+    character: 'C'
+  },
+  '111122112': {
+    value: 13,
+    character: 'D'
+  },
+  '211122111': {
+    value: 14,
+    character: 'E'
+  },
+  '112122111': {
+    value: 15,
+    character: 'F'
+  },
+  '111112212': {
+    value: 16,
+    character: 'G'
+  },
+  '211112211': {
+    value: 17,
+    character: 'H'
+  },
+  '112112211': {
+    value: 18,
+    character: 'I'
+  },
+  '111122211': {
+    value: 19,
+    character: 'J'
+  },
+  '211111122': {
+    value: 20,
+    character: 'K'
+  },
+  '112111122': {
+    value: 21,
+    character: 'L'
+  },
+  '212111121': {
+    value: 22,
+    character: 'M'
+  },
+  '111121122': {
+    value: 23,
+    character: 'N'
+  },
+  '211121121': {
+    value: 24,
+    character: 'O'
+  },
+  '112121121': {
+    value: 25,
+    character: 'P'
+  },
+  '111111222': {
+    value: 26,
+    character: 'Q'
+  },
+  '211111221': {
+    value: 27,
+    character: 'R'
+  },
+  '112111221': {
+    value: 28,
+    character: 'S'
+  },
+  '111121221': {
+    value: 29,
+    character: 'T'
+  },
+  '221111112': {
+    value: 30,
+    character: 'U'
+  },
+  '122111112': {
+    value: 31,
+    character: 'V'
+  },
+  '222111111': {
+    value: 32,
+    character: 'W'
+  },
+  '121121112': {
+    value: 33,
+    character: 'X'
+  },
+  '221121111': {
+    value: 34,
+    character: 'Y'
+  },
+  '122121111': {
+    value: 35,
+    character: 'Z'
+  },
+  '121111212': {
+    value: 36,
+    character: '-'
+  },
+  '221111211': {
+    value: 37,
+    character: '.'
+  },
+  '122111211': {
+    value: 38,
+    character: ' '
+  },
+  '121212111': {
+    value: 39,
+    character: '$'
+  },
+  '121211121': {
+    value: 40,
+    character: '/'
+  },
+  '121112121': {
+    value: 41,
+    character: '+'
+  },
+  '111212121': {
+    value: 42,
+    character: '%'
+  },
+  '121121211': {
+    value: -1,
+    character: '*'
+  }
+};
+
+const ExtendedEncoding = {
+  '/A': '!',
+  '/B': '\'',
+  '/C': '#',
+  '/D': '$',
+  '/E': '%',
+  '/F': '&',
+  '/G': '\'',
+  '/H': '(',
+  '/I': ')',
+  '/J': '*',
+  '/K': '+',
+  '/L': ',',
+  '/O': '/',
+  '/Z': ':',
+  '%F': ';',
+  '%G': '<',
+  '%H': '=',
+  '%I': '>',
+  '%J': '?',
+  '%K': '[',
+  '%L': '\\',
+  '%M': ']',
+  '%N': '^',
+  '%O': '_',
+  '+A': 'a',
+  '+B': 'b',
+  '+C': 'c',
+  '+D': 'd',
+  '+E': 'e',
+  '+F': 'f',
+  '+G': 'g',
+  '+H': 'h',
+  '+I': 'i',
+  '+J': 'j',
+  '+K': 'k',
+  '+L': 'l',
+  '+M': 'm',
+  '+N': 'n',
+  '+O': 'o',
+  '+P': 'p',
+  '+Q': 'q',
+  '+R': 'r',
+  '+S': 's',
+  '+T': 't',
+  '+U': 'u',
+  '+V': 'v',
+  '+W': 'w',
+  '+X': 'x',
+  '+Y': 'y',
+  '+Z': 'z',
+  '%P': '{',
+  '%Q': '|',
+  '%R': '|',
+  '%S': '~',
+};
+
+const CodaBarEncoding = {
+  '0000011': '0',
+  '0000110': '1',
+  '0001001': '2',
+  '1100000': '3',
+  '0010010': '4',
+  '1000010': '5',
+  '0100001': '6',
+  '0100100': '7',
+  '0110000': '8',
+  '1001000': '9',
+  '0001100': '-',
+  '0011000': '$',
+  '1000101': ':',
+  '1010001': '/',
+  '1010100': '.',
+  '0011111': '+',
+  '0011010': 'A',
+  '0001011': 'B',
+  '0101001': 'C',
+  '0001110': 'D'
+};
+
+const EAN13Encoding = {
+  'L': {
+    '3211': 0,
+    '2221': 1,
+    '2122': 2,
+    '1411': 3,
+    '1132': 4,
+    '1231': 5,
+    '1114': 6,
+    '1312': 7,
+    '1213': 8,
+    '3112': 9
+  },
+  'G': {
+    '1123': 0,
+    '1222': 1,
+    '2212': 2,
+    '1141': 3,
+    '2311': 4,
+    '1321': 5,
+    '4111': 6,
+    '2131': 7,
+    '3121': 8,
+    '2113': 9
+  },
+  'R': {
+    '3211': 0,
+    '2221': 1,
+    '2122': 2,
+    '1411': 3,
+    '1132': 4,
+    '1231': 5,
+    '1114': 6,
+    '1312': 7,
+    '1213': 8,
+    '3112': 9
+  },
+  formats: {
+    'LLLLLL': 0,
+    'LLGLGG': 1,
+    'LLGGLG': 2,
+    'LLGGGL': 3,
+    'LGLLGG': 4,
+    'LGGLLG': 5,
+    'LGGGLL': 6,
+    'LGLGLG': 7,
+    'LGLGGL': 8,
+    'LGGLGL': 9
+  }
+};
+
 const SecureCodabar = true;
 const Secure2Of5 = true;
-let Image, ScanImage, allTables, FormatPriority, Multiple, Locations
+let Image, ScanImage, allTables, FormatPriority, Multiple, Locations;
 
 function Rotate(data, width, height, rotation) {
   var newData = [];
   var x, y;
+
   switch (rotation) {
     case 90:
       for (x = 0; x < width * 4; x += 4) {
@@ -78,6 +1241,7 @@ function BoxFilter(data, width, radius) {
   var sum = [];
   var val;
   var x, y, i;
+
   for (x = 0; x < width; x++) {
     elements.push([]);
     sum.push(0);
@@ -86,17 +1250,20 @@ function BoxFilter(data, width, radius) {
       sum[sum.length - 1] = sum[sum.length - 1] + data[x + y];
     }
   }
-  var newData = [];
+  let newData = [];
+
   for (y = 0; y < data.length; y += width) {
     for (x = 0; x < width; x++) {
-      var newVal = 0;
-      var length = 0;
+      let newVal = 0;
+      let length = 0;
+
       for (i = x; i >= 0; i--) {
         newVal += sum[i];
         length++;
         if (length === radius + 1) break;
       }
-      var tempLength = 0;
+      let tempLength = 0;
+
       for (i = x + 1; i < width; i++) {
         newVal += sum[i];
         length++;
@@ -127,13 +1294,19 @@ function BoxFilter(data, width, radius) {
 function Scale(data, width, height) {
   var newData = [];
   var x, y;
+
   for (y = 0; y < data.length; y += width * 8) {
     for (x = 0; x < width * 4; x += 8) {
-      var r = (data[y + x] + data[y + x + 4] + data[y + width * 4 + x] + data[y + width * 4 + x + 4]) / 4;
+      let r = (data[y + x] + data[y + x + 4] + data[y + width * 4 + x] + data[y + width * 4 + x + 4]) / 4;
+
       newData.push(r);
-      var g = (data[y + x + 1] + data[y + x + 4 + 1] + data[y + width * 4 + x + 1] + data[y + width * 4 + x + 4 + 1]) / 4;
+      let g = (data[y + x + 1] + data[y + x + 4 + 1] + data[y + width * 4 + x + 1] +
+        data[y + width * 4 + x + 4 + 1]) / 4;
+
       newData.push(g);
-      var b = (data[y + x + 2] + data[y + x + 4 + 2] + data[y + width * 4 + x + 2] + data[y + width * 4 + x + 4 + 2]) / 4;
+      let b = (data[y + x + 2] + data[y + x + 4 + 2] + data[y + width * 4 + x + 2] +
+        data[y + width * 4 + x + 4 + 2]) / 4;
+
       newData.push(b);
       newData.push(255);
     }
@@ -146,10 +1319,12 @@ function IntensityGradient(data, width) {
   var max = Number.MIN_VALUE;
   var min = Number.MAX_VALUE;
   var x, y, i;
+
   for (y = 0; y < data.length; y += width * 4) {
     for (x = 0; x < width * 4; x += 4) {
-      var horizontalDiff = 0;
-      var verticalDiff = 0;
+      let horizontalDiff = 0;
+      let verticalDiff = 0;
+
       for (i = 1; i < 2; i++) {
         if (x + i * 4 < width * 4) {
           horizontalDiff = horizontalDiff + Math.abs(data[y + x] - data[y + x + i * 4]);
@@ -158,7 +1333,8 @@ function IntensityGradient(data, width) {
           verticalDiff += verticalDiff + Math.abs(data[y + x] - data[y + x + width * 4 * i]);
         }
       }
-      var diff = horizontalDiff - verticalDiff;
+      let diff = horizontalDiff - verticalDiff;
+
       max = diff > max ? diff : max;
       min = diff < min ? diff : min;
       newData.push(diff);
@@ -175,9 +1351,11 @@ function IntensityGradient(data, width) {
 
 function greyScale(data) {
   var i;
+
   for (i = 0; i < data.length; i += 4) {
-    var max = 0;
-    var min = 255;
+    let max = 0;
+    let min = 255;
+
     max = data[i] > max ? data[i] : max;
     max = data[i + 1] > max ? data[i + 1] : max;
     max = data[i + 2] > max ? data[i + 2] : max;
@@ -188,23 +1366,22 @@ function greyScale(data) {
   }
 }
 
-function histogram(data) {
-  var i;
-  var hist = [];
-  for (i = 0; i < 256; i++) {
-    hist[i] = 0;
-  }
-  for (i = 0; i < data.length; i += 4) {
-    hist[data[i]] = hist[data[i]] + 1;
-  }
-  return hist;
-}
+// function histogram(data) {
+//   var i;
+//   var hist = [];
+
+//   for (i = 0; i < 256; i++) {
+//     hist[i] = 0;
+//   }
+//   for (i = 0; i < data.length; i += 4) {
+//     hist[data[i]] = hist[data[i]] + 1;
+//   }
+//   return hist;
+// }
 
 function otsu(histogram, total) {
   var i;
   var sum = 0;
-  for (i = 1; i < histogram.length; ++i)
-    sum += i * histogram[i];
   var sumB = 0;
   var wB = 0;
   var wF = 0;
@@ -214,13 +1391,16 @@ function otsu(histogram, total) {
   var between = 0.0;
   var threshold1 = 0.0;
   var threshold2 = 0.0;
+
+  for (i = 1; i < histogram.length; ++i) {
+    sum += i * histogram[i];
+  }
+
   for (i = 0; i < histogram.length; ++i) {
     wB += histogram[i];
-    if (wB === 0)
-      continue;
+    if (wB === 0) {continue;}
     wF = total - wB;
-    if (wF === 0)
-      break;
+    if (wF === 0) {break;}
     sumB += i * histogram[i];
     mB = sumB / wB;
     mF = (sum - sumB) / wF;
@@ -237,9 +1417,11 @@ function otsu(histogram, total) {
 }
 
 function CreateImageData() {
-  Image.data = new Uint8ClampedArray(Image.width * Image.height * 4);
   var Converter;
   var x, y;
+
+  Image.data = new Uint8ClampedArray(Image.width * Image.height * 4);
+
   for (y = 0; y < Image.height; y++) {
     for (x = 0; x < Image.width; x++) {
       Converter = y * 4 * Image.width;
@@ -251,25 +1433,29 @@ function CreateImageData() {
   }
 }
 
-function CreateScanImageData() {
-  ScanImage.data = new Uint8ClampedArray(ScanImage.width * ScanImage.height * 4);
-  var Converter;
-  var x, y;
-  for (y = 0; y < ScanImage.height; y++) {
-    for (x = 0; x < ScanImage.width; x++) {
-      Converter = y * 4 * ScanImage.width;
-      ScanImage.data[Converter + x * 4] = ScanImage.table[x][y][0];
-      ScanImage.data[Converter + x * 4 + 1] = ScanImage.table[x][y][1];
-      ScanImage.data[Converter + x * 4 + 2] = ScanImage.table[x][y][2];
-      ScanImage.data[Converter + x * 4 + 3] = ScanImage.table[x][y][3];
-    }
-  }
-}
+// function CreateScanImageData() {
+//   var Converter;
+//   var x, y;
+
+//   ScanImage.data = new Uint8ClampedArray(ScanImage.width * ScanImage.height * 4);
+
+//   for (y = 0; y < ScanImage.height; y++) {
+//     for (x = 0; x < ScanImage.width; x++) {
+//       Converter = y * 4 * ScanImage.width;
+//       ScanImage.data[Converter + x * 4] = ScanImage.table[x][y][0];
+//       ScanImage.data[Converter + x * 4 + 1] = ScanImage.table[x][y][1];
+//       ScanImage.data[Converter + x * 4 + 2] = ScanImage.table[x][y][2];
+//       ScanImage.data[Converter + x * 4 + 3] = ScanImage.table[x][y][3];
+//     }
+//   }
+// }
 
 function CreateTable() {
-  Image.table = [];
   var tempArray = [];
   var i, j;
+
+  Image.table = [];
+
   for (i = 0; i < Image.width * 4; i += 4) {
     tempArray = [];
     for (j = i; j < Image.data.length; j += Image.width * 4) {
@@ -280,9 +1466,11 @@ function CreateTable() {
 }
 
 function CreateScanTable() {
-  ScanImage.table = [];
   var tempArray = [];
   var i, j;
+
+  ScanImage.table = [];
+
   for (i = 0; i < ScanImage.width * 4; i += 4) {
     tempArray = [];
     for (j = i; j < ScanImage.data.length; j += ScanImage.width * 4) {
@@ -295,6 +1483,7 @@ function CreateScanTable() {
 function EnlargeTable(h, w) {
   var TempArray = [];
   var x, y, i;
+
   for (x = 0; x < Image.width; x++) {
     TempArray = [];
     for (y = 0; y < Image.height; y++) {
@@ -321,6 +1510,7 @@ function ScaleHeight(scale) {
   var avrgGreen = 0;
   var avrgBlue = 0;
   var i, j, k;
+
   for (i = 0; i < Image.height - scale; i += scale) {
     for (j = 0; j < Image.width; j++) {
       avrgRed = 0;
@@ -351,13 +1541,15 @@ function maxLocalization(max, maxPos, data) {
   var originalMax = max;
   var rects = [];
   var x, y, i;
+
   do {
-    var startX = maxPos % Image.width;
-    var startY = (maxPos - startX) / Image.width;
-    var minY = 0;
-    var maxY = Image.height;
-    var minX = 0;
-    var maxX = Image.width - 1;
+    let startX = maxPos % Image.width;
+    let startY = (maxPos - startX) / Image.width;
+    let minY = 0;
+    let maxY = Image.height;
+    let minX = 0;
+    let maxX = Image.width - 1;
+
     for (y = startY; y < Image.height - 1; y++) {
       if (Image.table[startX][y + 1][0] === 0) {
         maxY = y;
@@ -387,10 +1579,11 @@ function maxLocalization(max, maxPos, data) {
         data[y + x] = 0;
       }
     }
-    var newRect = [
+    let newRect = [
       [minX, maxX],
       [minY, maxY]
     ];
+
     for (i = 0; i < rects.length; i++) {
       if (Intersects(newRect, rects[i])) {
         if (rects[i][0][1] - rects[i][0][0] > newRect[0][1] - newRect[0][0]) {
@@ -413,7 +1606,7 @@ function maxLocalization(max, maxPos, data) {
     }
     max = 0;
     maxPos = 0;
-    var newMaxPos = 0;
+
     for (i = 0; i < data.length; i++) {
       if (data[i] > max) {
         max = data[i];
@@ -425,17 +1618,23 @@ function maxLocalization(max, maxPos, data) {
 }
 
 function ImgProcessing() {
-  greyScale(Image.data);
-  var newData = IntensityGradient(Image.data, Image.width);
-  newData = BoxFilter(newData, Image.width, 15);
-  var min = newData[0];
+  var newData;
+  var min;
   var i, x, y;
-  for (i = 1; i < newData.length; i++) {
-    min = min > newData[i] ? newData[i] : min;
-  }
   var max = 0;
   var maxPos = 0;
   var avrgLight = 0;
+
+  greyScale(Image.data);
+  newData = IntensityGradient(Image.data, Image.width);
+  min = newData[0];
+
+  newData = BoxFilter(newData, Image.width, 15);
+
+  for (i = 1; i < newData.length; i++) {
+    min = min > newData[i] ? newData[i] : min;
+  }
+
   for (i = 0; i < newData.length; i++) {
     newData[i] = Math.round((newData[i] - min));
     avrgLight += newData[i];
@@ -461,14 +1660,16 @@ function ImgProcessing() {
       }
     }
   }
-  var hist = [];
+  let hist = [];
+
   for (i = 0; i <= max; i++) {
     hist[i] = 0;
   }
   for (i = 0; i < newData.length; i++) {
     hist[newData[i]] = hist[newData[i]] + 1;
   }
-  var thresh = otsu(hist, newData.length);
+  let thresh = otsu(hist, newData.length);
+
   for (i = 0; i < newData.length; i++) {
     if (newData[i] < thresh) {
       Image.data[i * 4] = Image.data[i * 4 + 1] = Image.data[i * 4 + 2] = 0;
@@ -477,8 +1678,9 @@ function ImgProcessing() {
     }
   }
   CreateTable();
-  var rects = maxLocalization(max, maxPos, newData);
-  var feedBack = [];
+  let rects = maxLocalization(max, maxPos, newData);
+  let feedBack = [];
+
   for (i = 0; i < rects.length; i++) {
     feedBack.push({
       x: rects[i][0][0],
@@ -487,16 +1689,20 @@ function ImgProcessing() {
       height: rects[i][1][1] - rects[i][1][0]
     });
   }
-  if (feedBack.length > 0) postMessage({
-    result: feedBack,
-    success: "localization"
-  });
+  if (feedBack.length > 0) {
+    postMessage({
+      result: feedBack,
+      success: 'localization'
+    });
+  }
   Locations = feedBack;
   allTables = [];
   for (i = 0; i < rects.length; i++) {
-    var newTable = [];
+    let newTable = [];
+
     for (x = rects[i][0][0] * 2; x < rects[i][0][1] * 2; x++) {
-      var tempArray = [];
+      let tempArray = [];
+
       for (y = rects[i][1][0] * 2; y < rects[i][1][1] * 2; y++) {
         tempArray.push([ScanImage.table[x][y][0], ScanImage.table[x][y][1], ScanImage.table[x][y][2], 255]);
       }
@@ -516,158 +1722,21 @@ function ImgProcessing() {
   }
 }
 
-function showImage(data, width, height) {
-  postMessage({
-    result: data,
-    width: width,
-    height: height,
-    success: "image"
-  });
-}
-
-function Main() {
-  ImgProcessing();
-  var allResults = [];
-  var tempObj;
-  var tempData;
-  var hist;
-  var val;
-  var thresh;
-  var start;
-  var end;
-  var z, i;
-  for (z = 0; z < allTables.length; z++) {
-    Image = allTables[z];
-    var scaled = ScaleHeight(30);
-    var variationData;
-    var incrmt = 0;
-    var format = "";
-    var first = true;
-    var eanStatistics = {};
-    var eanOrder = [];
-    var Selection = false;
-    do {
-      tempData = scaled.subarray(incrmt, incrmt + Image.width * 4);
-      hist = [];
-      for (i = 0; i < 256; i++) {
-        hist[i] = 0;
-      }
-      for (i = 0; i < tempData.length; i += 4) {
-        val = Math.round((tempData[i] + tempData[i + 1] + tempData[i + 2]) / 3);
-        hist[val] = hist[val] + 1;
-      }
-      thresh = otsu(hist, tempData.length / 4);
-      start = thresh < 41 ? 1 : thresh - 40;
-      end = thresh > 254 - 40 ? 254 : thresh + 40;
-      variationData = yStraighten(tempData, start, end);
-      Selection = BinaryString(variationData);
-      if (Selection.string) {
-        format = Selection.format;
-        tempObj = Selection;
-        Selection = Selection.string;
-        if (format === "EAN-13") {
-          if (typeof eanStatistics[Selection] === 'undefined') {
-            eanStatistics[Selection] = {
-              count: 1,
-              correction: tempObj.correction
-            };
-            eanOrder.push(Selection);
-          } else {
-            eanStatistics[Selection].count = eanStatistics[Selection].count + 1;
-            eanStatistics[Selection].correction = eanStatistics[Selection].correction + tempObj.correction;
-          }
-          Selection = false;
-        }
-      } else {
-        Selection = false;
-      }
-      incrmt += Image.width * 4;
-    } while (!Selection && incrmt < scaled.length);
-    if (Selection && format !== "EAN-13") allResults.push({
-      Format: format,
-      Value: Selection
-    });
-    if (format === "EAN-13") Selection = false;
-    if (!Selection) {
-      EnlargeTable(4, 2);
-      incrmt = 0;
-      scaled = ScaleHeight(20);
-      do {
-        tempData = scaled.subarray(incrmt, incrmt + Image.width * 4);
-        hist = [];
-        for (i = 0; i < 256; i++) {
-          hist[i] = 0;
-        }
-        for (i = 0; i < tempData.length; i += 4) {
-          val = Math.round((tempData[i] + tempData[i + 1] + tempData[i + 2]) / 3);
-          hist[val] = hist[val] + 1;
-        }
-        thresh = otsu(hist, tempData.length / 4);
-        start = thresh < 40 ? 0 : thresh - 40;
-        end = thresh > 255 - 40 ? 255 : thresh + 40;
-        variationData = yStraighten(tempData, start, end);
-        Selection = BinaryString(variationData);
-        if (Selection.string) {
-          format = Selection.format;
-          tempObj = Selection;
-          Selection = Selection.string;
-          if (format === "EAN-13") {
-            if (typeof eanStatistics[Selection] === 'undefined') {
-              eanStatistics[Selection] = {
-                count: 1,
-                correction: tempObj.correction
-              };
-              eanOrder.push(Selection);
-            } else {
-              eanStatistics[Selection].count = eanStatistics[Selection].count + 1;
-              eanStatistics[Selection].correction = eanStatistics[Selection].correction + tempObj.correction;
-            }
-            Selection = false;
-          }
-        } else {
-          Selection = false;
-        }
-        incrmt += Image.width * 4;
-      } while (!Selection && incrmt < scaled.length);
-      if (format === "EAN-13") {
-        var points = {};
-        for (var key in eanStatistics) {
-          eanStatistics[key].correction = eanStatistics[key].correction / eanStatistics[key].count;
-          var pointTemp = eanStatistics[key].correction;
-          pointTemp -= eanStatistics[key].count;
-          pointTemp += eanOrder.indexOf(key);
-          points[key] = pointTemp;
-        }
-        var minPoints = Number.POSITIVE_INFINITY;
-        var tempString = "";
-        for (var point in points) {
-          if (points[point] < minPoints) {
-            minPoints = points[point];
-            tempString = key;
-          }
-        }
-        if (minPoints < 11) {
-          Selection = tempString;
-        } else {
-          Selection = false;
-        }
-      }
-      if (Selection) allResults.push({
-        Format: format,
-        Value: Selection,
-        bBox: Locations[z],
-      });
-    }
-    if (allResults.length > 0 && !Multiple) break;
-  }
-  return allResults;
-}
+// function showImage(data, width, height) {
+//   postMessage({
+//     result: data,
+//     width: width,
+//     height: height,
+//     success: 'image'
+//   });
+// }
 
 function yStraighten(img, start, end) {
   var average = 0;
   var threshold;
   var newImg = new Uint8ClampedArray(Image.width * (end - start + 1) * 4);
   var i, j;
+
   for (i = 0; i < newImg.length; i++) {
     newImg[i] = 255;
   }
@@ -694,88 +1763,31 @@ function CheckEan13(values, middle) {
   } else {
     if (values.length !== 3) return false;
   }
-  var avrg = 0;
-  var i;
-  for (i = 0; i < values.length; i++) {
+
+  let avrg = 0;
+
+  for (let i = 0; i < values.length; i++) {
     avrg += values[i];
   }
   avrg /= values.length;
-  for (i = 0; i < values.length; i++) {
+  for (let i = 0; i < values.length; i++) {
     if (values[i] / avrg < 0.5 || values[i] / avrg > 1.5) return false;
   }
   return true;
-}
-
-function TwoOfFiveStartEnd(values, start) {
-  if (values.length < 5 || values.length > 6) return false;
-  var maximum = 0;
-  var TwoOfFiveMax = [0, 0];
-  var u;
-  for (u = 0; u < values.length; u++) {
-    if (values[u] > maximum) {
-      maximum = values[u];
-      TwoOfFiveMax[0] = u;
-    }
-  }
-  maximum = 0;
-  for (u = 0; u < values.length; u++) {
-    if (u === TwoOfFiveMax[0]) continue;
-    if (values[u] > maximum) {
-      maximum = values[u];
-      TwoOfFiveMax[1] = u;
-    }
-  }
-  if (start) {
-    return TwoOfFiveMax[0] + TwoOfFiveMax[1] === 2;
-  } else {
-    return TwoOfFiveMax[0] + TwoOfFiveMax[1] === 2;
-  }
-}
-
-function CheckInterleaved(values, start) {
-  var average = 0;
-  var i;
-  for (i = 0; i < values.length; i++) {
-    average += values[i];
-  }
-  average /= 4;
-  if (start) {
-    if (values.length !== 4) return false;
-    for (i = 0; i < values.length; i++) {
-      if (values[i] / average < 0.5 || values[i] / average > 1.5) return false;
-    }
-    return true;
-  } else {
-    if (values.length !== 3) return false;
-    var max = 0;
-    var pos;
-    for (i = 0; i < values.length; i++) {
-      if (values[i] > max) {
-        max = values[i];
-        pos = i;
-      }
-    }
-    if (pos !== 0) return false;
-    if (values[0] / average < 1.5 || values[0] / average > 2.5) return false;
-    for (i = 1; i < values.length; i++) {
-      if (values[i] / average < 0.5 || values[i] / average > 1.5) return false;
-    }
-    return true;
-  }
 }
 
 function BinaryConfiguration(binaryString, type) {
   var result = [];
   var binTemp = [];
   var count = 0;
-  var bars;
   var len;
   var totalBars;
   var i;
-  if (type === "Code128" || type === "Code93") {
+
+  if (type === 'Code128' || type === 'Code93') {
     totalBars = 6;
     len = binaryString[0];
-    if (type === "Code128") len /= 2;
+    if (type === 'Code128') len /= 2;
     for (i = 0; i < binaryString.length; i++) {
       if (binaryString[i] > len * 6) {
         binaryString.splice(i, binaryString.length);
@@ -783,15 +1795,15 @@ function BinaryConfiguration(binaryString, type) {
       }
     }
     do {
-      if (binaryString.length === 7 && type === "Code128") {
+      if (binaryString.length === 7 && type === 'Code128') {
         result.push(binaryString.splice(0, binaryString.length));
       } else {
         result.push(binaryString.splice(0, totalBars));
       }
-      if (type === "Code93" && binaryString.length < 6) binaryString.splice(0, totalBars);
+      if (type === 'Code93' && binaryString.length < 6) binaryString.splice(0, totalBars);
     } while (binaryString.length > 0);
   }
-  if (type === "Code39") {
+  if (type === 'Code39') {
     totalBars = 9;
     len = binaryString[0];
     for (i = 0; i < binaryString.length; i++) {
@@ -805,10 +1817,11 @@ function BinaryConfiguration(binaryString, type) {
       binaryString.splice(0, 1);
     } while (binaryString.length > 0);
   }
-  if (type === "EAN-13") {
+  if (type === 'EAN-13') {
     totalBars = 4;
     len = binaryString[0];
-    var secureCount = 0;
+    let secureCount = 0;
+
     for (i = 0; i < binaryString.length; i++) {
       if (binaryString[i] > len * 6) {
         binaryString.splice(i, binaryString.length);
@@ -820,13 +1833,12 @@ function BinaryConfiguration(binaryString, type) {
     do {
       result.push(binaryString.splice(0, totalBars));
       count++;
-      if (count === 6)
-        if (CheckEan13(binaryString.splice(0, 5), true)) secureCount++;
+      if (count === 6) {if (CheckEan13(binaryString.splice(0, 5), true)) secureCount++;}
     } while (result.length < 12 && binaryString.length > 0);
     if (CheckEan13(binaryString.splice(0, 3), false)) secureCount++;
     if (secureCount < 2) return [];
   }
-  if (type === "2Of5") {
+  if (type === '2Of5') {
     totalBars = 5;
     len = binaryString[0] / 2;
     for (i = 0; i < binaryString.length; i++) {
@@ -835,7 +1847,8 @@ function BinaryConfiguration(binaryString, type) {
         break;
       }
     }
-    var temp = binaryString.splice(0, 6);
+    let temp = binaryString.splice(0, 6);
+
     result.push(temp);
     do {
       binTemp = [];
@@ -847,7 +1860,7 @@ function BinaryConfiguration(binaryString, type) {
       if (binaryString.length === 5) result.push(binaryString.splice(0, 5));
     } while (binaryString.length > 0);
   }
-  if (type === "Inter2Of5") {
+  if (type === 'Inter2Of5') {
     totalBars = 5;
     len = binaryString[0];
     for (i = 0; i < binaryString.length; i++) {
@@ -857,7 +1870,8 @@ function BinaryConfiguration(binaryString, type) {
       }
     }
     result.push(binaryString.splice(0, 4));
-    var binTempWhite = [];
+    let binTempWhite = [];
+
     do {
       binTemp = [];
       binTempWhite = [];
@@ -870,7 +1884,7 @@ function BinaryConfiguration(binaryString, type) {
       if (binaryString.length === 3) result.push(binaryString.splice(0, 3));
     } while (binaryString.length > 0);
   }
-  if (type === "Codabar") {
+  if (type === 'Codabar') {
     totalBars = 7;
     len = binaryString[0];
     for (i = 0; i < binaryString.length; i++) {
@@ -887,139 +1901,65 @@ function BinaryConfiguration(binaryString, type) {
   return result;
 }
 
-function BinaryString(img, type) {
-  var binaryString = [];
-  var binTemp = [];
-  var container = 255;
-  var count = 0;
-  var format;
-  var tempString;
-  var j, i;
-  var corrections;
-  for (j = 0; j < img.length - Image.width * 4; j += Image.width * 4) {
-    var SlicedArray = img.subarray(j, j + Image.width * 4);
-    binaryString = [];
-    i = 0;
-    while (SlicedArray[i] === 255) {
-      i += 4;
-    }
-    while (i < SlicedArray.length) {
-      count = 0;
-      container = SlicedArray[i];
-      while (SlicedArray[i] === container && i < SlicedArray.length) {
-        count++;
-        i += 4;
-      }
-      binaryString.push(count);
-    }
-    if (binaryString.length > 2 && binaryString[0] <= binaryString[1] / 10) {
-      binaryString.splice(0, 2);
-    }
-    var binaryHolder = binaryString.slice();
-    var success = false;
-    for (i = 0; i < FormatPriority.length; i++) {
-      binaryString = binaryHolder.slice();
-      var first;
-      var second;
-      binaryString = BinaryConfiguration(binaryString, FormatPriority[i]);
-      if (FormatPriority[i] === "2Of5" || FormatPriority[i] === "Inter2Of5") {
-        first = binaryString.splice(0, 1)[0];
-        second = binaryString.splice(binaryString.length - 1, 1)[0];
-      }
-      binTemp = Distribution(binaryString, FormatPriority[i]);
-      if (FormatPriority[i] === "EAN-13") {
-        binaryString = binTemp.data;
-        corrections = binTemp.correction;
-      } else {
-        binaryString = binTemp;
-      }
-      if (typeof binaryString === 'undefined') continue;
-      if (binaryString.length > 4 || (FormatPriority[i] === "Code39" && binaryString.length > 2)) {
-        if (FormatPriority[i] === "Code128") {
-          if (CheckCode128(binaryString)) {
-            binaryString = DecodeCode128(binaryString);
-            success = true;
-          }
-        } else if (FormatPriority[i] === "Code93") {
-          if (CheckCode93(binaryString)) {
-            binaryString = DecodeCode93(binaryString);
-            success = true;
-          }
-        } else if (FormatPriority[i] === "Code39") {
-          if (CheckCode39(binaryString)) {
-            binaryString = DecodeCode39(binaryString);
-            success = true;
-          }
-        } else if (FormatPriority[i] === "EAN-13") {
-          tempString = DecodeEAN13(binaryString);
-          if (tempString) {
-            if (tempString.length === 13) {
-              binaryString = tempString;
-              success = true;
-            }
-          }
-        } else if (FormatPriority[i] === "2Of5" || FormatPriority[i] === "Inter2Of5") {
-          if (FormatPriority[i] === "2Of5") {
-            if (typeof first !== 'undefined')
-              if (!TwoOfFiveStartEnd(first, true)) continue;
-            if (typeof second !== 'undefined')
-              if (!TwoOfFiveStartEnd(second, false)) continue;
-          }
-          if (FormatPriority[i] === "Inter2Of5") {
-            if (typeof first !== 'undefined')
-              if (!CheckInterleaved(first, true)) continue;
-            if (typeof second !== 'undefined')
-              if (!CheckInterleaved(second, false)) continue;
-          }
-          tempString = Decode2Of5(binaryString);
-          if (tempString) {
-            binaryString = tempString;
-            success = true;
-          }
-        } else if (FormatPriority[i] === "Codabar") {
-          tempString = DecodeCodaBar(binaryString);
-          if (tempString) {
-            binaryString = tempString;
-            success = true;
-          }
-        }
-      }
-      if (success) {
-        format = FormatPriority[i];
-        if (format === "Inter2Of5") format = "Interleaved 2 of 5";
-        if (format === "2Of5") format = "Standard 2 of 5";
-        break;
-      }
-    }
-    if (success) break;
-  }
-  if (format === "Code128") {
-    if (typeof binaryString.string === 'string') {
-      return binaryString;
-    } else {
-      return {
-        string: false
-      };
+function TwoOfFiveStartEnd(values, start) {
+  if (values.length < 5 || values.length > 6) return false;
+  let maximum = 0;
+  let TwoOfFiveMax = [0, 0];
+  let u;
+
+  for (u = 0; u < values.length; u++) {
+    if (values[u] > maximum) {
+      maximum = values[u];
+      TwoOfFiveMax[0] = u;
     }
   }
-  if (typeof binaryString === 'string') {
-    if (format === "EAN-13") {
-      return {
-        string: binaryString,
-        format: format,
-        correction: corrections
-      };
-    } else {
-      return {
-        string: binaryString,
-        format: format
-      };
+  maximum = 0;
+  for (u = 0; u < values.length; u++) {
+    if (u === TwoOfFiveMax[0]) continue;
+    if (values[u] > maximum) {
+      maximum = values[u];
+      TwoOfFiveMax[1] = u;
     }
-  } else {
-    return {
-      string: false
-    };
   }
+  if (start) {
+    return TwoOfFiveMax[0] + TwoOfFiveMax[1] === 2;
+  }
+  return TwoOfFiveMax[0] + TwoOfFiveMax[1] === 2;
+  
+}
+
+function CheckInterleaved(values, start) {
+  var average = 0;
+  var i;
+
+  for (i = 0; i < values.length; i++) {
+    average += values[i];
+  }
+  average /= 4;
+  if (start) {
+    if (values.length !== 4) return false;
+    for (i = 0; i < values.length; i++) {
+      if (values[i] / average < 0.5 || values[i] / average > 1.5) return false;
+    }
+    return true;
+  }
+  if (values.length !== 3) return false;
+  let max = 0;
+  let pos;
+
+  for (i = 0; i < values.length; i++) {
+    if (values[i] > max) {
+      max = values[i];
+      pos = i;
+    }
+  }
+  if (pos !== 0) return false;
+  if (values[0] / average < 1.5 || values[0] / average > 2.5) return false;
+  for (i = 1; i < values.length; i++) {
+    if (values[i] / average < 0.5 || values[i] / average > 1.5) return false;
+  }
+  return true;
+  
 }
 
 function Distribution(totalBinArray, type) {
@@ -1058,15 +1998,15 @@ function Distribution(totalBinArray, type) {
     totalBars = 7;
   }
   for (k = 0; k < totalBinArray.length; k++) {
-    var BinArray = totalBinArray[k];
-    var sum = 0;
-    var counter = 0;
-    var tempBin = [];
-    var narrowArr = [];
-    var wideArr = [];
+    let BinArray = totalBinArray[k];
+    let sum = 0;
+    let counter = 0;
+    let tempBin = [];
+
     if (type === 6) {
-      var upperTolerance = 1.5;
-      var lowerTolerance = 1 / 2;
+      let upperTolerance = 1.5;
+      let lowerTolerance = 1 / 2;
+
       if (BinArray.length !== 7) return [];
       if (k === 0 || k === totalBinArray.length - 1) {
         whiteMax = [
@@ -1136,7 +2076,8 @@ function Distribution(totalBinArray, type) {
           }
         }
         if (blackMax[0] / whiteMax[0] > 1.55) {
-          var tempArray = blackMax;
+          let tempArray = blackMax;
+
           blackMax = [tempArray, [0, 0],
             [0, 0]
           ];
@@ -1257,12 +2198,13 @@ function Distribution(totalBinArray, type) {
       counter++;
     }
     if (type === 2) {
-      var indexCount = [];
+
       blackMax = [
         [0, 0],
         [0, 0]
       ];
       whiteMax = [0, 0];
+
       for (j = 0; j < BinArray.length; j++) {
         if (j % 2 === 0) {
           if (BinArray[j] > blackMax[0][0]) {
@@ -1360,15 +2302,19 @@ function Distribution(totalBinArray, type) {
         narrowAvrg /= 3;
         for (j = 0; j < BinArray.length; j++) {
           if (j === max[0][1]) continue;
-          if (BinArray[j] / narrowAvrg < 0.02 || BinArray[j] / narrowAvrg > 3) return {
+          if (BinArray[j] / narrowAvrg < 0.02 || BinArray[j] / narrowAvrg > 3) {
+            return {
+              data: [],
+              correction: 0
+            };
+          }
+        }
+        if (max[0][0] / narrowAvrg < 2.2 || max[0][0] / narrowAvrg > 6) {
+          return {
             data: [],
             correction: 0
           };
         }
-        if (max[0][0] / narrowAvrg < 2.2 || max[0][0] / narrowAvrg > 6) return {
-          data: [],
-          correction: 0
-        };
         for (j = 0; j < BinArray.length; j++) {
           if (j === max[0][1]) {
             tempBin.push(4);
@@ -1380,14 +2326,18 @@ function Distribution(totalBinArray, type) {
       } else if (max[0][0] / max[2][0] > 2) {
         wideAvrg = max[0][0] + max[1][0];
         wideAvrg /= 5;
-        if (max[0][0] / (wideAvrg * 3) < 0.02 || max[0][0] / (wideAvrg * 3) > 3) return {
-          data: [],
-          correction: 0
-        };
-        if (max[1][0] / (wideAvrg * 2) < 0.02 || max[1][0] / (wideAvrg * 2) > 3) return {
-          data: [],
-          correction: 0
-        };
+        if (max[0][0] / (wideAvrg * 3) < 0.02 || max[0][0] / (wideAvrg * 3) > 3) {
+          return {
+            data: [],
+            correction: 0
+          };
+        }
+        if (max[1][0] / (wideAvrg * 2) < 0.02 || max[1][0] / (wideAvrg * 2) > 3) {
+          return {
+            data: [],
+            correction: 0
+          };
+        }
         narrowAvrg = 0;
         for (j = 0; j < BinArray.length; j++) {
           if (j === max[0][1] || j === max[1][1]) continue;
@@ -1396,10 +2346,12 @@ function Distribution(totalBinArray, type) {
         narrowAvrg /= 2;
         for (j = 0; j < BinArray.length; j++) {
           if (j === max[0][1] || j === max[1][1]) continue;
-          if (BinArray[j] / narrowAvrg < 0.02 || BinArray[j] / narrowAvrg > 3) return {
-            data: [],
-            correction: 0
-          };
+          if (BinArray[j] / narrowAvrg < 0.02 || BinArray[j] / narrowAvrg > 3) {
+            return {
+              data: [],
+              correction: 0
+            };
+          }
         }
         for (j = 0; j < BinArray.length; j++) {
           if (j === max[0][1]) {
@@ -1413,7 +2365,8 @@ function Distribution(totalBinArray, type) {
         result.push(tempBin);
       } else {
         if (max[0][1] % 2 === max[1][1] % 2 && max[0][1] % 2 === max[2][1] % 2) {
-          var modMem = max[0][1] % 2;
+          let modMem = max[0][1] % 2;
+
           max[2] = [0, 0];
           for (j = 0; j < BinArray.length; j++) {
             if (j % 2 === modMem) continue;
@@ -1426,20 +2379,25 @@ function Distribution(totalBinArray, type) {
         wideAvrg = max[0][0] + max[1][0] + max[2][0];
         wideAvrg /= 3;
         for (j = 0; j < max.length; j++) {
-          if (max[j][0] / wideAvrg < 0.02 || max[j][0] / wideAvrg > 3) return {
-            data: [],
-            correction: 0
-          };
+          if (max[j][0] / wideAvrg < 0.02 || max[j][0] / wideAvrg > 3) {
+            return {
+              data: [],
+              correction: 0
+            };
+          }
         }
-        var narrow = 0;
+        let narrow = 0;
+
         for (j = 0; j < BinArray.length; j++) {
           if (j === max[0][1] || j === max[1][1] || j === max[2][1]) continue;
           narrow = BinArray[j];
         }
-        if (wideAvrg / narrow < 0.02 || wideAvrg / narrow > 3) return {
-          data: [],
-          correction: 0
-        };
+        if (wideAvrg / narrow < 0.02 || wideAvrg / narrow > 3) {
+          return {
+            data: [],
+            correction: 0
+          };
+        }
         for (j = 0; j < BinArray.length; j++) {
           if (j === max[0][1] || j === max[1][1] || j === max[2][1]) {
             tempBin.push(2);
@@ -1467,14 +2425,16 @@ function Distribution(totalBinArray, type) {
       counter++;
     }
     if (type === 3) {
-      var checking = 0;
-      for (i = 0; i < tempBin.length; i++) {
+      let checking = 0;
+
+      for (let i = 0; i < tempBin.length; i++) {
         checking += tempBin[i];
       }
       if (checking > 7) {
         max = 0;
-        var hitIndex = 0;
-        for (i = 0; i < tempBin.length; i++) {
+        let hitIndex = 0;
+
+        for (let i = 0; i < tempBin.length; i++) {
           if (tempBin[i] > max) {
             max = tempBin[i];
             hitIndex = i;
@@ -1495,90 +2455,102 @@ function Distribution(totalBinArray, type) {
       data: result,
       correction: testData
     };
-  } else {
-    return result;
   }
+  return result;
+  
 }
 
 function CheckCode128(string) {
-  var checksum = string[string.length - 2].join("");
-  var i;
+  var checksum = string[string.length - 2].join('');
+
   checksum = Code128Encoding.value.indexOf(checksum);
   if (checksum === -1) return false;
-  var summarizer = Code128Encoding.value.indexOf(string[0].join(""));
+  let summarizer = Code128Encoding.value.indexOf(string[0].join(''));
+
   if (summarizer === -1) return false;
-  var startChar = Code128Encoding[string[0].join("")];
+  let startChar = Code128Encoding[string[0].join('')];
+
   if (typeof startChar === 'undefined') return false;
-  if (startChar !== "A" && startChar !== "B" && startChar !== "C") return false;
-  for (i = 1; i < (string.length - 2); i++) {
-    summarizer += Code128Encoding.value.indexOf(string[i].join("")) * i;
-    if (Code128Encoding.value.indexOf(string[i].join("")) === -1) return false;
+  if (startChar !== 'A' && startChar !== 'B' && startChar !== 'C') return false;
+  for (let i = 1; i < (string.length - 2); i++) {
+    summarizer += Code128Encoding.value.indexOf(string[i].join('')) * i;
+    if (Code128Encoding.value.indexOf(string[i].join('')) === -1) return false;
   }
   return (summarizer % 103 === checksum);
 }
 
 function Decode2Of5(string) {
-  var result = "";
-  var i;
-  for (i = 0; i < string.length; i++) {
-    if (TwoOfFiveEncoding.indexOf(string[i].join("")) === -1) return false;
-    result += TwoOfFiveEncoding.indexOf(string[i].join(""));
+  var result = '';
+
+  for (let i = 0; i < string.length; i++) {
+    if (TwoOfFiveEncoding.indexOf(string[i].join('')) === -1) return false;
+    result += TwoOfFiveEncoding.indexOf(string[i].join(''));
   }
   return result;
 }
 
 function DecodeCodaBar(string) {
-  var result = "";
-  var start = string[0].join("");
-  var end = string[string.length - 1].join("");
-  var i;
-  if (!(CodaBarEncoding[start] === "A" || CodaBarEncoding[start] === "B" || CodaBarEncoding[start] === "C" || CodaBarEncoding[start] === "D")) return false;
-  if (!(CodaBarEncoding[end] === "A" || CodaBarEncoding[end] === "B" || CodaBarEncoding[end] === "C" || CodaBarEncoding[end] === "D")) return false;
-  for (i = 1; i < string.length - 1; i++) {
-    if (typeof CodaBarEncoding[string[i].join("")] === 'undefined') return false;
-    result += CodaBarEncoding[string[i].join("")];
+  var result = '';
+  var start = string[0].join('');
+  var end = string[string.length - 1].join('');
+
+  if (!(CodaBarEncoding[start] === 'A' || CodaBarEncoding[start] === 'B' ||
+    CodaBarEncoding[start] === 'C' || CodaBarEncoding[start] === 'D')) {
+    return false;
+  }
+  
+  if (!(CodaBarEncoding[end] === 'A' || CodaBarEncoding[end] === 'B' ||
+    CodaBarEncoding[end] === 'C' || CodaBarEncoding[end] === 'D')) {
+    return false;
+  }
+
+  for (let i = 1; i < string.length - 1; i++) {
+    if (typeof CodaBarEncoding[string[i].join('')] === 'undefined') return false;
+    result += CodaBarEncoding[string[i].join('')];
   }
   return result;
 }
 
 function DecodeEAN13(string) {
   if (string.length !== 12) return false;
-  var leftSide = string.slice(0, 6);
-  var trigger = false;
-  var rightSide = string.slice(6, string.length);
-  var i;
-  for (i = 0; i < leftSide.length; i++) {
-    leftSide[i] = leftSide[i].join("");
+  let leftSide = string.slice(0, 6);
+  let trigger = false;
+  let rightSide = string.slice(6, string.length);
+
+  for (let i = 0; i < leftSide.length; i++) {
+    leftSide[i] = leftSide[i].join('');
     if (leftSide[i].length !== 4) {
       trigger = true;
       break;
     }
   }
   if (trigger) return false;
-  for (i = 0; i < rightSide.length; i++) {
-    rightSide[i] = rightSide[i].join("");
+  for (let i = 0; i < rightSide.length; i++) {
+    rightSide[i] = rightSide[i].join('');
     if (rightSide[i].length !== 4) {
       trigger = true;
       break;
     }
   }
   if (trigger) return false;
-  var decodeFormat = [];
-  for (i = 0; i < leftSide.length; i++) {
+  let decodeFormat = [];
+
+  for (let i = 0; i < leftSide.length; i++) {
     if (typeof EAN13Encoding.L[leftSide[i]] !== 'undefined') {
-      decodeFormat.push("L");
+      decodeFormat.push('L');
     } else if (typeof EAN13Encoding.G[leftSide[i]] !== 'undefined') {
-      decodeFormat.push("G");
+      decodeFormat.push('G');
     } else {
       trigger = true;
       break;
     }
   }
   if (trigger) return false;
-  var resultArray = [];
-  if (typeof EAN13Encoding.formats[decodeFormat.join("")] === 'undefined') return false;
-  resultArray.push(EAN13Encoding.formats[decodeFormat.join("")]);
-  for (i = 0; i < leftSide.length; i++) {
+  let resultArray = [];
+
+  if (typeof EAN13Encoding.formats[decodeFormat.join('')] === 'undefined') return false;
+  resultArray.push(EAN13Encoding.formats[decodeFormat.join('')]);
+  for (let i = 0; i < leftSide.length; i++) {
     if (typeof EAN13Encoding[decodeFormat[i]][leftSide[i]] === 'undefined') {
       trigger = true;
       break;
@@ -1586,7 +2558,7 @@ function DecodeEAN13(string) {
     resultArray.push(EAN13Encoding[decodeFormat[i]][leftSide[i]]);
   }
   if (trigger) return false;
-  for (i = 0; i < rightSide.length; i++) {
+  for (let i = 0; i < rightSide.length; i++) {
     if (typeof EAN13Encoding.R[rightSide[i]] === 'undefined') {
       trigger = true;
       break;
@@ -1594,9 +2566,10 @@ function DecodeEAN13(string) {
     resultArray.push(EAN13Encoding.R[rightSide[i]]);
   }
   if (trigger) return false;
-  var weight = 3;
-  var sum = 0;
-  for (i = resultArray.length - 2; i >= 0; i--) {
+  let weight = 3;
+  let sum = 0;
+
+  for (let i = resultArray.length - 2; i >= 0; i--) {
     sum += resultArray[i] * weight;
     if (weight === 3) {
       weight = 1;
@@ -1606,56 +2579,61 @@ function DecodeEAN13(string) {
   }
   sum = (10 - sum % 10) % 10;
   if (resultArray[resultArray.length - 1] === sum) {
-    return resultArray.join("");
-  } else {
-    return false;
+    return resultArray.join('');
   }
+  return false;
+  
 }
 
 function CheckCode93(string) {
-  var checkOne = string[string.length - 3].join("");
-  var checkTwo = string[string.length - 2].join("");
+  var checkOne = string[string.length - 3].join('');
+  var checkTwo = string[string.length - 2].join('');
   var failSafe = true;
+
   if (typeof Code93Encoding[checkOne] === 'undefined') return false;
   if (typeof Code93Encoding[checkTwo] === 'undefined') return false;
-  var checkSum = Code93Encoding[checkOne].value;
-  var weight = 1;
-  var sum = 0;
-  var i;
-  for (i = string.length - 4; i > 0; i--) {
-    failSafe = typeof Code93Encoding[string[i].join("")] === 'undefined' ? false : failSafe;
+  let checkSum = Code93Encoding[checkOne].value;
+  let weight = 1;
+  let sum = 0;
+
+  for (let i = string.length - 4; i > 0; i--) {
+    failSafe = typeof Code93Encoding[string[i].join('')] === 'undefined' ? false : failSafe;
     if (!failSafe) break;
-    sum += Code93Encoding[string[i].join("")].value * weight;
+    sum += Code93Encoding[string[i].join('')].value * weight;
     weight++;
     if (weight > 20) weight = 1;
   }
-  var firstCheck = sum % 47;
-  var firstBool = firstCheck === checkSum;
+  let firstCheck = sum % 47;
+  let firstBool = firstCheck === checkSum;
+
   if (!firstBool) return false;
   if (!failSafe) return false;
   sum = firstCheck;
   weight = 2;
   checkSum = Code93Encoding[checkTwo].value;
-  for (i = string.length - 4; i > 0; i--) {
-    failSafe = typeof Code93Encoding[string[i].join("")] === 'undefined' ? false : failSafe;
+  for (let i = string.length - 4; i > 0; i--) {
+    failSafe = typeof Code93Encoding[string[i].join('')] === 'undefined' ? false : failSafe;
     if (!failSafe) break;
-    sum += Code93Encoding[string[i].join("")].value * weight;
+    sum += Code93Encoding[string[i].join('')].value * weight;
     weight++;
     if (weight > 15) weight = 1;
   }
-  var secondCheck = sum % 47;
-  var secondBool = secondCheck === checkSum;
+  let secondCheck = sum % 47;
+  let secondBool = secondCheck === checkSum;
+
   return secondBool && firstBool;
 }
 
 function CheckCode39(string) {
   var trigger = true;
-  if (typeof Code39Encoding[string[0].join("")] === 'undefined') return false;
-  if (Code39Encoding[string[0].join("")].character !== "*") return false;
-  if (typeof Code39Encoding[string[string.length - 1].join("")] === 'undefined') return false;
-  if (Code39Encoding[string[string.length - 1].join("")].character !== "*") return false;
-  for (i = 1; i < string.length - 1; i++) {
-    if (typeof Code39Encoding[string[i].join("")] === 'undefined') {
+
+  if (typeof Code39Encoding[string[0].join('')] === 'undefined') return false;
+  if (Code39Encoding[string[0].join('')].character !== '*') return false;
+  if (typeof Code39Encoding[string[string.length - 1].join('')] === 'undefined') return false;
+  if (Code39Encoding[string[string.length - 1].join('')].character !== '*') return false;
+
+  for (let i = 1; i < string.length - 1; i++) {
+    if (typeof Code39Encoding[string[i].join('')] === 'undefined') {
       trigger = false;
       break;
     }
@@ -1664,13 +2642,15 @@ function CheckCode39(string) {
 }
 
 function DecodeCode39(string) {
-  var resultString = "";
+  var resultString = '';
   var special = false;
-  var character = "";
-  var specialchar = "";
+  var character = '';
+  var specialchar = '';
+  var i;
+
   for (i = 1; i < string.length - 1; i++) {
-    character = Code39Encoding[string[i].join("")].character;
-    if (character === "$" || character === "/" || character === "+" || character === "%") {
+    character = Code39Encoding[string[i].join('')].character;
+    if (character === '$' || character === '/' || character === '+' || character === '%') {
       // if next character exists => this a special character
       if (i + 1 < string.length - 1) {
         special = true;
@@ -1691,13 +2671,14 @@ function DecodeCode39(string) {
 }
 
 function DecodeCode93(string) {
-  var resultString = "";
+  var resultString = '';
   var special = false;
-  var character = "";
-  var specialchar = "";
-  for (i = 1; i < string.length - 3; i++) {
-    character = Code93Encoding[string[i].join("")].character;
-    if (character === "($)" || character === "(/)" || character === "(+)" || character === "(%)") {
+  var character = '';
+  var specialchar = '';
+
+  for (let i = 1; i < string.length - 3; i++) {
+    character = Code93Encoding[string[i].join('')].character;
+    if (character === '($)' || character === '(/)' || character === '(+)' || character === '(%)') {
       special = true;
       specialchar = character[1];
       continue;
@@ -1715,37 +2696,38 @@ function DecodeCode93(string) {
 }
 
 function DecodeCode128(string) {
-  var set = Code128Encoding[string[0].join("")];
+  var set = Code128Encoding[string[0].join('')];
   var symbol;
-  var Code128Format = "Code128";
-  var resultString = "";
+  var Code128Format = 'Code128';
+  var resultString = '';
   var i;
+
   for (i = 1; i < (string.length - 2); i++) {
-    symbol = Code128Encoding[string[i].join("")][set];
+    symbol = Code128Encoding[string[i].join('')][set];
     switch (symbol) {
-      case "FNC1":
-        if (i === 1) Code128Format = "GS1-128";
+      case 'FNC1':
+        if (i === 1) Code128Format = 'GS1-128';
         break;
-      case "FNC2":
-      case "FNC3":
-      case "FNC4":
+      case 'FNC2':
+      case 'FNC3':
+      case 'FNC4':
         break;
-      case "SHIFT_B":
+      case 'SHIFT_B':
         i++;
-        resultString += Code128Encoding[string[i].join("")].B;
+        resultString += Code128Encoding[string[i].join('')].B;
         break;
-      case "SHIFT_A":
+      case 'SHIFT_A':
         i++;
-        resultString += Code128Encoding[string[i].join("")].A;
+        resultString += Code128Encoding[string[i].join('')].A;
         break;
-      case "Code_A":
-        set = "A";
+      case 'Code_A':
+        set = 'A';
         break;
-      case "Code_B":
-        set = "B";
+      case 'Code_B':
+        set = 'B';
         break;
-      case "Code_C":
-        set = "C";
+      case 'Code_C':
+        set = 'C';
         break;
       default:
         resultString += symbol;
@@ -1756,1150 +2738,297 @@ function DecodeCode128(string) {
     format: Code128Format
   };
 }
-const TwoOfFiveEncoding = ["00110", "10001", "01001", "11000", "00101", "10100", "01100", "00011", "10010", "01010"];
-const Code128Encoding = {
-  "212222": {
-    A: " ",
-    B: " ",
-    C: "00"
-  },
-  "222122": {
-    A: "!",
-    B: "!",
-    C: "01"
-  },
-  "222221": {
-    A: '"',
-    B: '"',
-    C: "02"
-  },
-  "121223": {
-    A: "#",
-    B: "#",
-    C: "03"
-  },
-  "121322": {
-    A: "$",
-    B: "$",
-    C: "04"
-  },
-  "131222": {
-    A: "%",
-    B: "%",
-    C: "05"
-  },
-  "122213": {
-    A: "&",
-    B: "&",
-    C: "06"
-  },
-  "122312": {
-    A: "'",
-    B: "'",
-    C: "07"
-  },
-  "132212": {
-    A: "(",
-    B: "(",
-    C: "08"
-  },
-  "221213": {
-    A: ")",
-    B: ")",
-    C: "09"
-  },
-  "221312": {
-    A: "*",
-    B: "*",
-    C: "10"
-  },
-  "231212": {
-    A: "+",
-    B: "+",
-    C: "11"
-  },
-  "112232": {
-    A: ",",
-    B: ",",
-    C: "12"
-  },
-  "122132": {
-    A: "-",
-    B: "-",
-    C: "13"
-  },
-  "122231": {
-    A: ".",
-    B: ".",
-    C: "14"
-  },
-  "113222": {
-    A: "/",
-    B: "/",
-    C: "15"
-  },
-  "123122": {
-    A: "0",
-    B: "0",
-    C: "16"
-  },
-  "123221": {
-    A: "1",
-    B: "1",
-    C: "17"
-  },
-  "223211": {
-    A: "2",
-    B: "2",
-    C: "18"
-  },
-  "221132": {
-    A: "3",
-    B: "3",
-    C: "19"
-  },
-  "221231": {
-    A: "4",
-    B: "4",
-    C: "20"
-  },
-  "213212": {
-    A: "5",
-    B: "5",
-    C: "21"
-  },
-  "223112": {
-    A: "6",
-    B: "6",
-    C: "22"
-  },
-  "312131": {
-    A: "7",
-    B: "7",
-    C: "23"
-  },
-  "311222": {
-    A: "8",
-    B: "8",
-    C: "24"
-  },
-  "321122": {
-    A: "9",
-    B: "9",
-    C: "25"
-  },
-  "321221": {
-    A: ":",
-    B: ":",
-    C: "26"
-  },
-  "312212": {
-    A: ";",
-    B: ";",
-    C: "27"
-  },
-  "322112": {
-    A: "<",
-    B: "<",
-    C: "28"
-  },
-  "322211": {
-    A: "=",
-    B: "=",
-    C: "29"
-  },
-  "212123": {
-    A: ">",
-    B: ">",
-    C: "30"
-  },
-  "212321": {
-    A: "?",
-    B: "?",
-    C: "31"
-  },
-  "232121": {
-    A: "@",
-    B: "@",
-    C: "32"
-  },
-  "111323": {
-    A: "A",
-    B: "A",
-    C: "33"
-  },
-  "131123": {
-    A: "B",
-    B: "B",
-    C: "34"
-  },
-  "131321": {
-    A: "C",
-    B: "C",
-    C: "35"
-  },
-  "112313": {
-    A: "D",
-    B: "D",
-    C: "36"
-  },
-  "132113": {
-    A: "E",
-    B: "E",
-    C: "37"
-  },
-  "132311": {
-    A: "F",
-    B: "F",
-    C: "38"
-  },
-  "211313": {
-    A: "G",
-    B: "G",
-    C: "39"
-  },
-  "231113": {
-    A: "H",
-    B: "H",
-    C: "40"
-  },
-  "231311": {
-    A: "I",
-    B: "I",
-    C: "41"
-  },
-  "112133": {
-    A: "J",
-    B: "J",
-    C: "42"
-  },
-  "112331": {
-    A: "K",
-    B: "K",
-    C: "43"
-  },
-  "132131": {
-    A: "L",
-    B: "L",
-    C: "44"
-  },
-  "113123": {
-    A: "M",
-    B: "M",
-    C: "45"
-  },
-  "113321": {
-    A: "N",
-    B: "N",
-    C: "46"
-  },
-  "133121": {
-    A: "O",
-    B: "O",
-    C: "47"
-  },
-  "313121": {
-    A: "P",
-    B: "P",
-    C: "48"
-  },
-  "211331": {
-    A: "Q",
-    B: "Q",
-    C: "49"
-  },
-  "231131": {
-    A: "R",
-    B: "R",
-    C: "50"
-  },
-  "213113": {
-    A: "S",
-    B: "S",
-    C: "51"
-  },
-  "213311": {
-    A: "T",
-    B: "T",
-    C: "52"
-  },
-  "213131": {
-    A: "U",
-    B: "U",
-    C: "53"
-  },
-  "311123": {
-    A: "V",
-    B: "V",
-    C: "54"
-  },
-  "311321": {
-    A: "W",
-    B: "W",
-    C: "55"
-  },
-  "331121": {
-    A: "X",
-    B: "X",
-    C: "56"
-  },
-  "312113": {
-    A: "Y",
-    B: "Y",
-    C: "57"
-  },
-  "312311": {
-    A: "Z",
-    B: "Z",
-    C: "58"
-  },
-  "332111": {
-    A: "[",
-    B: "[",
-    C: "59"
-  },
-  "314111": {
-    A: "\\",
-    B: "\\",
-    C: "60"
-  },
-  "221411": {
-    A: "]",
-    B: "]",
-    C: "61"
-  },
-  "431111": {
-    A: "^",
-    B: "^",
-    C: "62"
-  },
-  "111224": {
-    A: "_",
-    B: "_",
-    C: "63"
-  },
-  "111422": {
-    A: "NUL",
-    B: "`",
-    C: "64"
-  },
-  "121124": {
-    A: "SOH",
-    B: "a",
-    C: "65"
-  },
-  "121421": {
-    A: "STX",
-    B: "b",
-    C: "66"
-  },
-  "141122": {
-    A: "ETX",
-    B: "c",
-    C: "67"
-  },
-  "141221": {
-    A: "EOT",
-    B: "d",
-    C: "68"
-  },
-  "112214": {
-    A: "ENQ",
-    B: "e",
-    C: "69"
-  },
-  "112412": {
-    A: "ACK",
-    B: "f",
-    C: "70"
-  },
-  "122114": {
-    A: "BEL",
-    B: "g",
-    C: "71"
-  },
-  "122411": {
-    A: "BS",
-    B: "h",
-    C: "72"
-  },
-  "142112": {
-    A: "HT",
-    B: "i",
-    C: "73"
-  },
-  "142211": {
-    A: "LF",
-    B: "j",
-    C: "74"
-  },
-  "241211": {
-    A: "VT",
-    B: "k",
-    C: "75"
-  },
-  "221114": {
-    A: "FF",
-    B: "l",
-    C: "76"
-  },
-  "413111": {
-    A: "CR",
-    B: "m",
-    C: "77"
-  },
-  "241112": {
-    A: "SO",
-    B: "n",
-    C: "78"
-  },
-  "134111": {
-    A: "SI",
-    B: "o",
-    C: "79"
-  },
-  "111242": {
-    A: "DLE",
-    B: "p",
-    C: "80"
-  },
-  "121142": {
-    A: "DC1",
-    B: "q",
-    C: "81"
-  },
-  "121241": {
-    A: "DC2",
-    B: "r",
-    C: "82"
-  },
-  "114212": {
-    A: "DC3",
-    B: "s",
-    C: "83"
-  },
-  "124112": {
-    A: "DC4",
-    B: "t",
-    C: "84"
-  },
-  "124211": {
-    A: "NAK",
-    B: "u",
-    C: "85"
-  },
-  "411212": {
-    A: "SYN",
-    B: "v",
-    C: "86"
-  },
-  "421112": {
-    A: "ETB",
-    B: "w",
-    C: "87"
-  },
-  "421211": {
-    A: "CAN",
-    B: "x",
-    C: "88"
-  },
-  "212141": {
-    A: "EM",
-    B: "y",
-    C: "89"
-  },
-  "214121": {
-    A: "SUB",
-    B: "z",
-    C: "90"
-  },
-  "412121": {
-    A: "ESC",
-    B: "{",
-    C: "91"
-  },
-  "111143": {
-    A: "FS",
-    B: "|",
-    C: "92"
-  },
-  "111341": {
-    A: "GS",
-    B: "}",
-    C: "93"
-  },
-  "131141": {
-    A: "RS",
-    B: "~",
-    C: "94"
-  },
-  "114113": {
-    A: "US",
-    B: "DEL",
-    C: "95"
-  },
-  "114311": {
-    A: "FNC3",
-    B: "FNC3",
-    C: "96"
-  },
-  "411113": {
-    A: "FNC2",
-    B: "FNC2",
-    C: "97"
-  },
-  "411311": {
-    A: "SHIFT_B",
-    B: "SHIFT_A",
-    C: "98"
-  },
-  "113141": {
-    A: "Code_C",
-    B: "Code_C",
-    C: "99"
-  },
-  "114131": {
-    A: "Code_B",
-    B: "FNC4",
-    C: "Code_B"
-  },
-  "311141": {
-    A: "FNC4",
-    B: "Code_A",
-    C: "Code_A"
-  },
-  "411131": {
-    A: "FNC1",
-    B: "FNC1",
-    C: "FNC1"
-  },
-  "211412": "A",
-  "211214": "B",
-  "211232": "C",
-  "233111": {
-    A: "STOP",
-    B: "STOP",
-    C: "STOP"
-  },
-  value: [
-    "212222",
-    "222122",
-    "222221",
-    "121223",
-    "121322",
-    "131222",
-    "122213",
-    "122312",
-    "132212",
-    "221213",
-    "221312",
-    "231212",
-    "112232",
-    "122132",
-    "122231",
-    "113222",
-    "123122",
-    "123221",
-    "223211",
-    "221132",
-    "221231",
-    "213212",
-    "223112",
-    "312131",
-    "311222",
-    "321122",
-    "321221",
-    "312212",
-    "322112",
-    "322211",
-    "212123",
-    "212321",
-    "232121",
-    "111323",
-    "131123",
-    "131321",
-    "112313",
-    "132113",
-    "132311",
-    "211313",
-    "231113",
-    "231311",
-    "112133",
-    "112331",
-    "132131",
-    "113123",
-    "113321",
-    "133121",
-    "313121",
-    "211331",
-    "231131",
-    "213113",
-    "213311",
-    "213131",
-    "311123",
-    "311321",
-    "331121",
-    "312113",
-    "312311",
-    "332111",
-    "314111",
-    "221411",
-    "431111",
-    "111224",
-    "111422",
-    "121124",
-    "121421",
-    "141122",
-    "141221",
-    "112214",
-    "112412",
-    "122114",
-    "122411",
-    "142112",
-    "142211",
-    "241211",
-    "221114",
-    "413111",
-    "241112",
-    "134111",
-    "111242",
-    "121142",
-    "121241",
-    "114212",
-    "124112",
-    "124211",
-    "411212",
-    "421112",
-    "421211",
-    "212141",
-    "214121",
-    "412121",
-    "111143",
-    "111341",
-    "131141",
-    "114113",
-    "114311",
-    "411113",
-    "411311",
-    "113141",
-    "114131",
-    "311141",
-    "411131",
-    "211412",
-    "211214",
-    "211232",
-    "233111"
-  ]
-};
 
-const Code93Encoding = {
-  "131112": {
-    value: 0,
-    character: "0"
-  },
-  "111213": {
-    value: 1,
-    character: "1"
-  },
-  "111312": {
-    value: 2,
-    character: "2"
-  },
-  "111411": {
-    value: 3,
-    character: "3"
-  },
-  "121113": {
-    value: 4,
-    character: "4"
-  },
-  "121212": {
-    value: 5,
-    character: "5"
-  },
-  "121311": {
-    value: 6,
-    character: "6"
-  },
-  "111114": {
-    value: 7,
-    character: "7"
-  },
-  "131211": {
-    value: 8,
-    character: "8"
-  },
-  "141111": {
-    value: 9,
-    character: "9"
-  },
-  "211113": {
-    value: 10,
-    character: "A"
-  },
-  "211212": {
-    value: 11,
-    character: "B"
-  },
-  "211311": {
-    value: 12,
-    character: "C"
-  },
-  "221112": {
-    value: 13,
-    character: "D"
-  },
-  "221211": {
-    value: 14,
-    character: "E"
-  },
-  "231111": {
-    value: 15,
-    character: "F"
-  },
-  "112113": {
-    value: 16,
-    character: "G"
-  },
-  "112212": {
-    value: 17,
-    character: "H"
-  },
-  "112311": {
-    value: 18,
-    character: "I"
-  },
-  "122112": {
-    value: 19,
-    character: "J"
-  },
-  "132111": {
-    value: 20,
-    character: "K"
-  },
-  "111123": {
-    value: 21,
-    character: "L"
-  },
-  "111222": {
-    value: 22,
-    character: "M"
-  },
-  "111321": {
-    value: 23,
-    character: "N"
-  },
-  "121122": {
-    value: 24,
-    character: "O"
-  },
-  "131121": {
-    value: 25,
-    character: "P"
-  },
-  "212112": {
-    value: 26,
-    character: "Q"
-  },
-  "212211": {
-    value: 27,
-    character: "R"
-  },
-  "211122": {
-    value: 28,
-    character: "S"
-  },
-  "211221": {
-    value: 29,
-    character: "T"
-  },
-  "221121": {
-    value: 30,
-    character: "U"
-  },
-  "222111": {
-    value: 31,
-    character: "V"
-  },
-  "112122": {
-    value: 32,
-    character: "W"
-  },
-  "112221": {
-    value: 33,
-    character: "X"
-  },
-  "122121": {
-    value: 34,
-    character: "Y"
-  },
-  "123111": {
-    value: 35,
-    character: "Z"
-  },
-  "121131": {
-    value: 36,
-    character: "-"
-  },
-  "311112": {
-    value: 37,
-    character: "."
-  },
-  "311211": {
-    value: 38,
-    character: " "
-  },
-  "321111": {
-    value: 39,
-    character: "$"
-  },
-  "112131": {
-    value: 40,
-    character: "/"
-  },
-  "113121": {
-    value: 41,
-    character: "+"
-  },
-  "211131": {
-    value: 42,
-    character: "%"
-  },
-  "121221": {
-    value: 43,
-    character: "($)"
-  },
-  "312111": {
-    value: 44,
-    character: "(%)"
-  },
-  "311121": {
-    value: 45,
-    character: "(/)"
-  },
-  "122211": {
-    value: 46,
-    character: "(+)"
-  },
-  "111141": {
-    value: -1,
-    character: "*"
+function BinaryString(img, type) {
+  var binaryString = [];
+  var binTemp = [];
+  var container = 255;
+  var count = 0;
+  var format;
+  var tempString;
+  var j, i;
+  var corrections;
+
+  for (j = 0; j < img.length - Image.width * 4; j += Image.width * 4) {
+    let SlicedArray = img.subarray(j, j + Image.width * 4);
+
+    binaryString = [];
+    i = 0;
+    while (SlicedArray[i] === 255) {
+      i += 4;
+    }
+    while (i < SlicedArray.length) {
+      count = 0;
+      container = SlicedArray[i];
+      while (SlicedArray[i] === container && i < SlicedArray.length) {
+        count++;
+        i += 4;
+      }
+      binaryString.push(count);
+    }
+    if (binaryString.length > 2 && binaryString[0] <= binaryString[1] / 10) {
+      binaryString.splice(0, 2);
+    }
+    let binaryHolder = binaryString.slice();
+    let success = false;
+
+    for (i = 0; i < FormatPriority.length; i++) {
+      binaryString = binaryHolder.slice();
+      let first;
+      let second;
+
+      binaryString = BinaryConfiguration(binaryString, FormatPriority[i]);
+      if (FormatPriority[i] === '2Of5' || FormatPriority[i] === 'Inter2Of5') {
+        first = binaryString.splice(0, 1)[0];
+        second = binaryString.splice(binaryString.length - 1, 1)[0];
+      }
+      binTemp = Distribution(binaryString, FormatPriority[i]);
+      if (FormatPriority[i] === 'EAN-13') {
+        binaryString = binTemp.data;
+        corrections = binTemp.correction;
+      } else {
+        binaryString = binTemp;
+      }
+      if (typeof binaryString === 'undefined') continue;
+      if (binaryString.length > 4 || (FormatPriority[i] === 'Code39' && binaryString.length > 2)) {
+        if (FormatPriority[i] === 'Code128') {
+          if (CheckCode128(binaryString)) {
+            binaryString = DecodeCode128(binaryString);
+            success = true;
+          }
+        } else if (FormatPriority[i] === 'Code93') {
+          if (CheckCode93(binaryString)) {
+            binaryString = DecodeCode93(binaryString);
+            success = true;
+          }
+        } else if (FormatPriority[i] === 'Code39') {
+          if (CheckCode39(binaryString)) {
+            binaryString = DecodeCode39(binaryString);
+            success = true;
+          }
+        } else if (FormatPriority[i] === 'EAN-13') {
+          tempString = DecodeEAN13(binaryString);
+          if (tempString) {
+            if (tempString.length === 13) {
+              binaryString = tempString;
+              success = true;
+            }
+          }
+        } else if (FormatPriority[i] === '2Of5' || FormatPriority[i] === 'Inter2Of5') {
+          if (FormatPriority[i] === '2Of5') {
+            if (typeof first !== 'undefined') {if (!TwoOfFiveStartEnd(first, true)) continue;}
+            if (typeof second !== 'undefined') {if (!TwoOfFiveStartEnd(second, false)) continue;}
+          }
+          if (FormatPriority[i] === 'Inter2Of5') {
+            if (typeof first !== 'undefined') {if (!CheckInterleaved(first, true)) continue;}
+            if (typeof second !== 'undefined') {if (!CheckInterleaved(second, false)) continue;}
+          }
+          tempString = Decode2Of5(binaryString);
+          if (tempString) {
+            binaryString = tempString;
+            success = true;
+          }
+        } else if (FormatPriority[i] === 'Codabar') {
+          tempString = DecodeCodaBar(binaryString);
+          if (tempString) {
+            binaryString = tempString;
+            success = true;
+          }
+        }
+      }
+      if (success) {
+        format = FormatPriority[i];
+        if (format === 'Inter2Of5') format = 'Interleaved 2 of 5';
+        if (format === '2Of5') format = 'Standard 2 of 5';
+        break;
+      }
+    }
+    if (success) break;
   }
-};
-
-const Code39Encoding = {
-  "111221211": {
-    value: 0,
-    character: "0"
-  },
-  "211211112": {
-    value: 1,
-    character: "1"
-  },
-  "112211112": {
-    value: 2,
-    character: "2"
-  },
-  "212211111": {
-    value: 3,
-    character: "3"
-  },
-  "111221112": {
-    value: 4,
-    character: "4"
-  },
-  "211221111": {
-    value: 5,
-    character: "5"
-  },
-  "112221111": {
-    value: 6,
-    character: "6"
-  },
-  "111211212": {
-    value: 7,
-    character: "7"
-  },
-  "211211211": {
-    value: 8,
-    character: "8"
-  },
-  "112211211": {
-    value: 9,
-    character: "9"
-  },
-  "211112112": {
-    value: 10,
-    character: "A"
-  },
-  "112112112": {
-    value: 11,
-    character: "B"
-  },
-  "212112111": {
-    value: 12,
-    character: "C"
-  },
-  "111122112": {
-    value: 13,
-    character: "D"
-  },
-  "211122111": {
-    value: 14,
-    character: "E"
-  },
-  "112122111": {
-    value: 15,
-    character: "F"
-  },
-  "111112212": {
-    value: 16,
-    character: "G"
-  },
-  "211112211": {
-    value: 17,
-    character: "H"
-  },
-  "112112211": {
-    value: 18,
-    character: "I"
-  },
-  "111122211": {
-    value: 19,
-    character: "J"
-  },
-  "211111122": {
-    value: 20,
-    character: "K"
-  },
-  "112111122": {
-    value: 21,
-    character: "L"
-  },
-  "212111121": {
-    value: 22,
-    character: "M"
-  },
-  "111121122": {
-    value: 23,
-    character: "N"
-  },
-  "211121121": {
-    value: 24,
-    character: "O"
-  },
-  "112121121": {
-    value: 25,
-    character: "P"
-  },
-  "111111222": {
-    value: 26,
-    character: "Q"
-  },
-  "211111221": {
-    value: 27,
-    character: "R"
-  },
-  "112111221": {
-    value: 28,
-    character: "S"
-  },
-  "111121221": {
-    value: 29,
-    character: "T"
-  },
-  "221111112": {
-    value: 30,
-    character: "U"
-  },
-  "122111112": {
-    value: 31,
-    character: "V"
-  },
-  "222111111": {
-    value: 32,
-    character: "W"
-  },
-  "121121112": {
-    value: 33,
-    character: "X"
-  },
-  "221121111": {
-    value: 34,
-    character: "Y"
-  },
-  "122121111": {
-    value: 35,
-    character: "Z"
-  },
-  "121111212": {
-    value: 36,
-    character: "-"
-  },
-  "221111211": {
-    value: 37,
-    character: "."
-  },
-  "122111211": {
-    value: 38,
-    character: " "
-  },
-  "121212111": {
-    value: 39,
-    character: "$"
-  },
-  "121211121": {
-    value: 40,
-    character: "/"
-  },
-  "121112121": {
-    value: 41,
-    character: "+"
-  },
-  "111212121": {
-    value: 42,
-    character: "%"
-  },
-  "121121211": {
-    value: -1,
-    character: "*"
+  if (format === 'Code128') {
+    if (typeof binaryString.string === 'string') {
+      return binaryString;
+    }
+    return {
+      string: false
+    };
+    
   }
-};
-
-const ExtendedEncoding = {
-  "/A": '!',
-  "/B": '"',
-  "/C": '#',
-  "/D": '$',
-  "/E": '%',
-  "/F": '&',
-  "/G": "'",
-  "/H": '(',
-  "/I": ')',
-  "/J": '*',
-  "/K": '+',
-  "/L": ',',
-  "/O": '/',
-  "/Z": ':',
-  "%F": ';',
-  "%G": '<',
-  "%H": '=',
-  "%I": '>',
-  "%J": '?',
-  "%K": '[',
-  "%L": "\\",
-  "%M": ']',
-  "%N": '^',
-  "%O": '_',
-  "+A": 'a',
-  "+B": 'b',
-  "+C": 'c',
-  "+D": 'd',
-  "+E": 'e',
-  "+F": 'f',
-  "+G": 'g',
-  "+H": 'h',
-  "+I": 'i',
-  "+J": 'j',
-  "+K": 'k',
-  "+L": 'l',
-  "+M": 'm',
-  "+N": 'n',
-  "+O": 'o',
-  "+P": 'p',
-  "+Q": 'q',
-  "+R": 'r',
-  "+S": 's',
-  "+T": 't',
-  "+U": 'u',
-  "+V": 'v',
-  "+W": 'w',
-  "+X": 'x',
-  "+Y": 'y',
-  "+Z": 'z',
-  "%P": "{",
-  "%Q": '|',
-  "%R": '|',
-  "%S": '~',
-};
-
-const CodaBarEncoding = {
-  "0000011": "0",
-  "0000110": "1",
-  "0001001": "2",
-  "1100000": "3",
-  "0010010": "4",
-  "1000010": "5",
-  "0100001": "6",
-  "0100100": "7",
-  "0110000": "8",
-  "1001000": "9",
-  "0001100": "-",
-  "0011000": "$",
-  "1000101": ":",
-  "1010001": "/",
-  "1010100": ".",
-  "0011111": "+",
-  "0011010": "A",
-  "0001011": "B",
-  "0101001": "C",
-  "0001110": "D"
-};
-
-const EAN13Encoding = {
-  "L": {
-    "3211": 0,
-    "2221": 1,
-    "2122": 2,
-    "1411": 3,
-    "1132": 4,
-    "1231": 5,
-    "1114": 6,
-    "1312": 7,
-    "1213": 8,
-    "3112": 9
-  },
-  "G": {
-    "1123": 0,
-    "1222": 1,
-    "2212": 2,
-    "1141": 3,
-    "2311": 4,
-    "1321": 5,
-    "4111": 6,
-    "2131": 7,
-    "3121": 8,
-    "2113": 9
-  },
-  "R": {
-    "3211": 0,
-    "2221": 1,
-    "2122": 2,
-    "1411": 3,
-    "1132": 4,
-    "1231": 5,
-    "1114": 6,
-    "1312": 7,
-    "1213": 8,
-    "3112": 9
-  },
-  formats: {
-    "LLLLLL": 0,
-    "LLGLGG": 1,
-    "LLGGLG": 2,
-    "LLGGGL": 3,
-    "LGLLGG": 4,
-    "LGGLLG": 5,
-    "LGGGLL": 6,
-    "LGLGLG": 7,
-    "LGLGGL": 8,
-    "LGGLGL": 9
+  if (typeof binaryString === 'string') {
+    if (format === 'EAN-13') {
+      return {
+        string: binaryString,
+        format: format,
+        correction: corrections
+      };
+    }
+    return {
+      string: binaryString,
+      format: format
+    };
+    
   }
-};
+  return {
+    string: false
+  };
+  
+}
 
-self.onmessage = function(e) {
+function Main() {
+  var allResults = [];
+  var tempObj;
+  var tempData;
+  var hist;
+  var val;
+  var thresh;
+  var start;
+  var end;
+  var z, i;
+
+  ImgProcessing();
+
+  for (z = 0; z < allTables.length; z++) {
+    Image = allTables[z];
+    let scaled = ScaleHeight(30);
+    let variationData;
+    let incrmt = 0;
+    let format = '';
+    let eanStatistics = {};
+    let eanOrder = [];
+    let Selection = false;
+
+    do {
+      tempData = scaled.subarray(incrmt, incrmt + Image.width * 4);
+      hist = [];
+      for (i = 0; i < 256; i++) {
+        hist[i] = 0;
+      }
+      for (i = 0; i < tempData.length; i += 4) {
+        val = Math.round((tempData[i] + tempData[i + 1] + tempData[i + 2]) / 3);
+        hist[val] = hist[val] + 1;
+      }
+      thresh = otsu(hist, tempData.length / 4);
+      start = thresh < 41 ? 1 : thresh - 40;
+      end = thresh > 254 - 40 ? 254 : thresh + 40;
+      variationData = yStraighten(tempData, start, end);
+      Selection = BinaryString(variationData);
+      if (Selection.string) {
+        format = Selection.format;
+        tempObj = Selection;
+        Selection = Selection.string;
+        if (format === 'EAN-13') {
+          if (typeof eanStatistics[Selection] === 'undefined') {
+            eanStatistics[Selection] = {
+              count: 1,
+              correction: tempObj.correction
+            };
+            eanOrder.push(Selection);
+          } else {
+            eanStatistics[Selection].count = eanStatistics[Selection].count + 1;
+            eanStatistics[Selection].correction = eanStatistics[Selection].correction + tempObj.correction;
+          }
+          Selection = false;
+        }
+      } else {
+        Selection = false;
+      }
+      incrmt += Image.width * 4;
+    } while (!Selection && incrmt < scaled.length);
+    if (Selection && format !== 'EAN-13') {
+      allResults.push({
+        Format: format,
+        Value: Selection,
+        bBox: Locations[z],
+      });
+    }
+    if (format === 'EAN-13') Selection = false;
+    if (!Selection) {
+      EnlargeTable(4, 2);
+      incrmt = 0;
+      scaled = ScaleHeight(20);
+      do {
+        tempData = scaled.subarray(incrmt, incrmt + Image.width * 4);
+        hist = [];
+        for (i = 0; i < 256; i++) {
+          hist[i] = 0;
+        }
+        for (i = 0; i < tempData.length; i += 4) {
+          val = Math.round((tempData[i] + tempData[i + 1] + tempData[i + 2]) / 3);
+          hist[val] = hist[val] + 1;
+        }
+        thresh = otsu(hist, tempData.length / 4);
+        start = thresh < 40 ? 0 : thresh - 40;
+        end = thresh > 255 - 40 ? 255 : thresh + 40;
+        variationData = yStraighten(tempData, start, end);
+        Selection = BinaryString(variationData);
+        if (Selection.string) {
+          format = Selection.format;
+          tempObj = Selection;
+          Selection = Selection.string;
+          if (format === 'EAN-13') {
+            if (typeof eanStatistics[Selection] === 'undefined') {
+              eanStatistics[Selection] = {
+                count: 1,
+                correction: tempObj.correction
+              };
+              eanOrder.push(Selection);
+            } else {
+              eanStatistics[Selection].count = eanStatistics[Selection].count + 1;
+              eanStatistics[Selection].correction = eanStatistics[Selection].correction + tempObj.correction;
+            }
+            Selection = false;
+          }
+        } else {
+          Selection = false;
+        }
+        incrmt += Image.width * 4;
+      } while (!Selection && incrmt < scaled.length);
+
+      if (format === 'EAN-13') {
+        let points = {};
+        let key;
+
+        for (key in eanStatistics) {
+          eanStatistics[key].correction = eanStatistics[key].correction / eanStatistics[key].count;
+          let pointTemp = eanStatistics[key].correction;
+
+          pointTemp -= eanStatistics[key].count;
+          pointTemp += eanOrder.indexOf(key);
+          points[key] = pointTemp;
+        }
+
+        let minPoints = Number.POSITIVE_INFINITY;
+        let tempString = '';
+
+        for (let point in points) {
+          if (points[point] < minPoints) {
+            minPoints = points[point];
+            tempString = key;
+          }
+        }
+        if (minPoints < 11) {
+          Selection = tempString;
+        } else {
+          Selection = false;
+        }
+      }
+
+      if (Selection) {
+        allResults.push({
+          Format: format,
+          Value: Selection,
+          bBox: Locations[z],
+        });
+      }
+    }
+    if (allResults.length > 0 && !Multiple) break;
+  }
+  return allResults;
+}
+
+self.onmessage = (e) => {
   var width;
-  var i;
+  var decodeFormats;
 
   ScanImage = {
     data: new Uint8ClampedArray(e.data.scan),
@@ -2930,25 +3059,33 @@ self.onmessage = function(e) {
   if (e.data.postOrientation) {
     postMessage({
       result: Image,
-      success: "orientationData"
+      success: 'orientationData'
     });
   }
+  
   FormatPriority = [];
-  var decodeFormats = ["Code128", "Code93", "Code39", "EAN-13", "2Of5", "Inter2Of5", "Codabar"];
   Multiple = true;
+  
   if (typeof e.data.multiple !== 'undefined') {
     Multiple = e.data.multiple;
   }
+
   if (typeof e.data.decodeFormats !== 'undefined') {
     decodeFormats = e.data.decodeFormats;
+  } else {
+    decodeFormats = availableFormats;
   }
-  for (i = 0; i < decodeFormats.length; i++) {
+  
+  for (let i = 0; i < decodeFormats.length; i++) {
     FormatPriority.push(decodeFormats[i]);
   }
+
   Locations = [];
   CreateTable();
   CreateScanTable();
-  var FinalResult = Main();
+
+  let FinalResult = Main();
+
   if (FinalResult.length > 0) {
     postMessage({
       id: e.data.id,
@@ -2963,3 +3100,4 @@ self.onmessage = function(e) {
     });
   }
 };
+
