@@ -1,0 +1,46 @@
+{
+  "name": "barcode-detector-polyfill",
+  "description": "Polyfill for BarcodeDetector API",
+  "main": [
+    "dist/BarcodeDetector.min.js"
+  ],
+  "dependencies": {
+  },
+  "devDependencies": {
+  },
+  "moduleType": [
+    "amd",
+    "globals",
+    "node",
+    "es6"
+  ],
+  "keywords": [
+    "shape detect",
+    "barcode",
+    "polyfill",
+    "webworker",
+    "webpack",
+    "es6",
+    "library",
+    "universal",
+    "umd",
+    "commonjs"
+  ],
+  "authors": [
+    "Gilad Dayagi"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "homepage": "https://github.com/giladaya/barcode-detector-polyfill",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/giladaya/barcode-detector-polyfill"
+  },
+  "private": true
+}
