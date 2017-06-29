@@ -3,24 +3,11 @@
 const webpack = require('webpack');
 const UglifyJsPlugin = webpack.optimize.UglifyJsPlugin;
 const path = require('path');
-const env  = require('yargs').argv.env; // use --env with webpack 2
+const env = require('yargs').argv.env; // use --env with webpack 2
 
 let libraryName = 'BarcodeDetector';
 
 let plugins = [], outputFile;
-
-// plugins.push(
-//   new webpack.LoaderOptionsPlugin({
-//     options: {
-//       worker: {
-//         output: {
-//           filename: "hash.worker.js",
-//           chunkFilename: "[id].hash.worker.js"
-//         }
-//       }
-//     }
-//   })
-// )
 
 if (env === 'build') {
   plugins.push(new UglifyJsPlugin({ minimize: true }));
@@ -33,7 +20,7 @@ const config = {
   entry: __dirname + '/src/index',
   devtool: 'source-map',
   output: {
-    path: path.join(__dirname, "dist"),
+    path: path.join(__dirname, 'dist'),
     filename: outputFile,
     library: [libraryName],
     libraryTarget: 'umd',
