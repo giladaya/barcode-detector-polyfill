@@ -43,9 +43,6 @@
         var canvas =document.getElementById("picture");
         var ctx = canvas.getContext("2d");
 
-        if (window.BarcodeDetector == undefined) {
-          window.BarcodeDetector = BarcodeDetector;
-        }
         var barcodeDetector = new BarcodeDetector();
 
         function handleResults (result) {

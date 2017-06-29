@@ -45,10 +45,13 @@
 
       var imgUrl = '2007001523239-01_N95-2592x1944_scaledTo800x600bilinear.jpg';
       var barcodeDetector = new BarcodeDetector();
+      var start;
 
       // img.crossOrigin = "No CORS";
       $img.onload = function() {
+        start = Date.now();
         barcodeDetector.detect($img).then(results => {
+          console.log('Took: ', (Date.now() - start) / 1000)
           str = results.map(function (res) {
             return res.rawValue
           }).join(', ');
