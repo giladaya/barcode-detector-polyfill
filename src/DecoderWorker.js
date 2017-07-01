@@ -1237,58 +1237,66 @@ function Rotate(data, width, height, rotation) {
 }
 
 function BoxFilter(data, width, radius) {
-  var elements = [];
-  var sum = [];
-  var val;
-  var x, y, i;
 
-  for (x = 0; x < width; x++) {
-    elements.push([]);
-    sum.push(0);
-    for (y = 0; y < (radius + 1) * width; y += width) {
-      elements[elements.length - 1].push(data[x + y]);
-      sum[sum.length - 1] = sum[sum.length - 1] + data[x + y];
+  // Pre-allocate
+  let sum = new Array(width).fill(0);
+  let elements = new Array(width).fill().map((e, i) => []);
+  const innerLoopLength = (radius + 1) * width;
+  const dataLength = data.length;
+
+  let output = new Array(dataLength + width);
+
+  for (let x = 0; x < width; x++) {
+    for (let y = 0; y < innerLoopLength; y += width) {
+      elements[x].push(data[x + y]);
+      sum[x] = sum[x] + data[x + y];
     }
   }
-  let newData = [];
 
-  for (y = 0; y < data.length; y += width) {
-    for (x = 0; x < width; x++) {
+  // elements length doesn't change from here
+  // can be made const so we don't have to reeval
+  const elementsLength = elements.length;
+
+  for (let y = 0; y < dataLength; y += width) {
+    for (let x = 0; x < width; x++) {
       let newVal = 0;
       let length = 0;
+      let tempLength = 0;
 
-      for (i = x; i >= 0; i--) {
+      for (let i = x; i >= 0; i--) {
         newVal += sum[i];
         length++;
         if (length === radius + 1) break;
       }
-      let tempLength = 0;
-
-      for (i = x + 1; i < width; i++) {
+      
+      for (let i = x + 1; i < width; i++) {
         newVal += sum[i];
         length++;
         tempLength++;
         if (tempLength === radius) break;
       }
+
       length *= elements[0].length;
       newVal /= length;
-      newData.push(newVal);
+      output[y + x] = newVal;
     }
     if (y - radius * width >= 0) {
-      for (i = 0; i < elements.length; i++) {
-        val = elements[i].shift();
+      for (let i = 0; i < elementsLength; i++) {
+        let val = elements[i].shift();
+
         sum[i] = sum[i] - val;
       }
     }
-    if (y + (radius + 1) * width < data.length) {
-      for (i = 0; i < elements.length; i++) {
-        val = data[i + y + (radius + 1) * width];
+    if (y + (radius + 1) * width < dataLength) {
+      for (let i = 0; i < elementsLength; i++) {
+        let val = data[i + y + (radius + 1) * width];
+
         elements[i].push(val);
         sum[i] = sum[i] + val;
       }
     }
   }
-  return newData;
+  return output;
 }
 
 function Scale(data, width, height) {
@@ -1350,9 +1358,7 @@ function IntensityGradient(data, width) {
 }
 
 function greyScale(data) {
-  var i;
-
-  for (i = 0; i < data.length; i += 4) {
+  for (let i = 0; i < data.length; i += 4) {
     let max = 0;
     let min = 255;
 
@@ -1392,11 +1398,13 @@ function otsu(histogram, total) {
   var threshold1 = 0.0;
   var threshold2 = 0.0;
 
-  for (i = 1; i < histogram.length; ++i) {
+  const histogramLength = histogram.length;
+
+  for (i = 1; i < histogramLength; ++i) {
     sum += i * histogram[i];
   }
 
-  for (i = 0; i < histogram.length; ++i) {
+  for (i = 0; i < histogramLength; ++i) {
     wB += histogram[i];
     if (wB === 0) {continue;}
     wF = total - wB;
@@ -1450,34 +1458,49 @@ function CreateImageData() {
 //   }
 // }
 
-function CreateTable() {
-  var tempArray = [];
-  var i, j;
+function ShuffleTable() {
+  let imageLengthX4 = Image.width * 4;
 
-  Image.table = [];
+  Image.table = new Array(imageLengthX4 / 4).fill().map((e, i) => []);;
 
-  for (i = 0; i < Image.width * 4; i += 4) {
-    tempArray = [];
-    for (j = i; j < Image.data.length; j += Image.width * 4) {
+  for (let i = 0; i < imageLengthX4; i += 4) {
+    let tempArray = [];
+
+    for (let j = i; j < Image.data.length; j += imageLengthX4) {
       tempArray.push([Image.data[j], Image.data[j + 1], Image.data[j + 2], Image.data[j + 3]]);
     }
-    Image.table.push(tempArray);
+    Image.table[i / 4] = tempArray;
   }
 }
 
+function CreateTable() {
+  return new Promise((resolve, reject) => {
+
+    ShuffleTable();
+    
+    resolve('CreateTable Complete');
+  });
+}
+
 function CreateScanTable() {
-  var tempArray = [];
-  var i, j;
+  return new Promise((resolve, reject) => {
 
-  ScanImage.table = [];
+    let scanImageDataLength = ScanImage.data.length;
+    let scanImageDataX4 = ScanImage.width * 4;
 
-  for (i = 0; i < ScanImage.width * 4; i += 4) {
-    tempArray = [];
-    for (j = i; j < ScanImage.data.length; j += ScanImage.width * 4) {
-      tempArray.push([ScanImage.data[j], ScanImage.data[j + 1], ScanImage.data[j + 2], ScanImage.data[j + 3]]);
+    ScanImage.table = new Array(scanImageDataX4 / 4).fill().map((e, i) => []);
+
+    for (let i = 0; i < scanImageDataX4; i += 4) {
+      let tempArray = [];
+
+      for (let j = i; j < scanImageDataLength; j += scanImageDataX4) {
+        tempArray.push([ScanImage.data[j], ScanImage.data[j + 1],
+          ScanImage.data[j + 2], ScanImage.data[j + 3]]);
+      }
+      ScanImage.table[i / 4] = tempArray;
     }
-    ScanImage.table.push(tempArray);
-  }
+    resolve('CreateScanTable Complete');
+  });
 }
 
 function EnlargeTable(h, w) {
@@ -1626,6 +1649,7 @@ function ImgProcessing() {
   var avrgLight = 0;
 
   greyScale(Image.data);
+  
   newData = IntensityGradient(Image.data, Image.width);
   min = newData[0];
 
@@ -1677,7 +1701,7 @@ function ImgProcessing() {
       Image.data[i * 4] = Image.data[i * 4 + 1] = Image.data[i * 4 + 2] = 255;
     }
   }
-  CreateTable();
+  ShuffleTable();
   let rects = maxLocalization(max, maxPos, newData);
   let feedBack = [];
 
@@ -2740,73 +2764,90 @@ function DecodeCode128(string) {
 }
 
 function BinaryString(img, type) {
-  var binaryString = [];
-  var binTemp = [];
-  var container = 255;
-  var count = 0;
-  var format;
-  var tempString;
-  var j, i;
-  var corrections;
+  let binaryString = [];
+  let format;
+  let tempString;
+  let corrections;
+  let container;
 
-  for (j = 0; j < img.length - Image.width * 4; j += Image.width * 4) {
-    let SlicedArray = img.subarray(j, j + Image.width * 4);
+  // things that don't change
+  const splitImageLength = img.length - Image.width * 4;
+  const imageWidthX4 = Image.width * 4;
 
-    binaryString = [];
-    i = 0;
+  for (let j = 0; j < splitImageLength; j += imageWidthX4) {
+    let i = 0;
+    let SlicedArray = img.subarray(j, j + imageWidthX4);
+
+    // could use SlicedArray.length but we have the numbers,
+    // so don't burn millis (15ms gain)
+    const slicedArrayLength = (j + imageWidthX4) - j;
+
     while (SlicedArray[i] === 255) {
       i += 4;
     }
-    while (i < SlicedArray.length) {
-      count = 0;
+
+    while (i < slicedArrayLength) {
+      let count = 0;
+
       container = SlicedArray[i];
-      while (SlicedArray[i] === container && i < SlicedArray.length) {
+
+      while (i < slicedArrayLength) {
+        if (SlicedArray[i] !== container) {
+          break;
+        }
         count++;
         i += 4;
       }
       binaryString.push(count);
     }
+
     if (binaryString.length > 2 && binaryString[0] <= binaryString[1] / 10) {
       binaryString.splice(0, 2);
     }
     let binaryHolder = binaryString.slice();
     let success = false;
 
-    for (i = 0; i < FormatPriority.length; i++) {
+    const FormatPriorityLength = FormatPriority.length;
+
+    for (let i = 0; i < FormatPriorityLength; i++) {
       binaryString = binaryHolder.slice();
       let first;
       let second;
 
-      binaryString = BinaryConfiguration(binaryString, FormatPriority[i]);
-      if (FormatPriority[i] === '2Of5' || FormatPriority[i] === 'Inter2Of5') {
+      format = FormatPriority[i];
+
+      binaryString = BinaryConfiguration(binaryString, format);
+      if (format === '2Of5' || format === 'Inter2Of5') {
         first = binaryString.splice(0, 1)[0];
         second = binaryString.splice(binaryString.length - 1, 1)[0];
       }
-      binTemp = Distribution(binaryString, FormatPriority[i]);
-      if (FormatPriority[i] === 'EAN-13') {
+      let binTemp = Distribution(binaryString, format);
+
+      if (format === 'EAN-13') {
         binaryString = binTemp.data;
         corrections = binTemp.correction;
       } else {
         binaryString = binTemp;
       }
       if (typeof binaryString === 'undefined') continue;
-      if (binaryString.length > 4 || (FormatPriority[i] === 'Code39' && binaryString.length > 2)) {
-        if (FormatPriority[i] === 'Code128') {
+
+      if (binaryString.length > 4 || (format === 'Code39' && binaryString.length > 2)) {
+        if (format === 'Code128') {
           if (CheckCode128(binaryString)) {
             binaryString = DecodeCode128(binaryString);
             success = true;
           }
-        } else if (FormatPriority[i] === 'Code93') {
+        } else if (format === 'Code93') {
           if (CheckCode93(binaryString)) {
             binaryString = DecodeCode93(binaryString);
             success = true;
           }
-        } else if (FormatPriority[i] === 'Code39') {
+        } else if (format === 'Code39') {
           if (CheckCode39(binaryString)) {
             binaryString = DecodeCode39(binaryString);
             success = true;
           }
-        } else if (FormatPriority[i] === 'EAN-13') {
+        } else if (format === 'EAN-13') {
           tempString = DecodeEAN13(binaryString);
           if (tempString) {
             if (tempString.length === 13) {
@@ -2814,12 +2855,12 @@ function BinaryString(img, type) {
               success = true;
             }
           }
-        } else if (FormatPriority[i] === '2Of5' || FormatPriority[i] === 'Inter2Of5') {
-          if (FormatPriority[i] === '2Of5') {
+        } else if (format === '2Of5' || format === 'Inter2Of5') {
+          if (format === '2Of5') {
             if (typeof first !== 'undefined') {if (!TwoOfFiveStartEnd(first, true)) continue;}
             if (typeof second !== 'undefined') {if (!TwoOfFiveStartEnd(second, false)) continue;}
           }
-          if (FormatPriority[i] === 'Inter2Of5') {
+          if (format === 'Inter2Of5') {
             if (typeof first !== 'undefined') {if (!CheckInterleaved(first, true)) continue;}
             if (typeof second !== 'undefined') {if (!CheckInterleaved(second, false)) continue;}
           }
@@ -2828,7 +2869,7 @@ function BinaryString(img, type) {
             binaryString = tempString;
             success = true;
           }
-        } else if (FormatPriority[i] === 'Codabar') {
+        } else if (format === 'Codabar') {
           tempString = DecodeCodaBar(binaryString);
           if (tempString) {
             binaryString = tempString;
@@ -2837,7 +2878,6 @@ function BinaryString(img, type) {
         }
       }
       if (success) {
-        format = FormatPriority[i];
         if (format === 'Inter2Of5') format = 'Interleaved 2 of 5';
         if (format === '2Of5') format = 'Standard 2 of 5';
         break;
@@ -3081,23 +3121,25 @@ self.onmessage = (e) => {
   }
 
   Locations = [];
-  CreateTable();
-  CreateScanTable();
 
-  let FinalResult = Main();
+  Promise.all([CreateTable(), CreateScanTable()]).then(_ => {
 
-  if (FinalResult.length > 0) {
-    postMessage({
-      id: e.data.id,
-      result: FinalResult,
-      success: true
-    });
-  } else {
-    postMessage({
-      id: e.data.id,
-      result: FinalResult,
-      success: false
-    });
-  }
+    let FinalResult = Main();
+
+    if (FinalResult.length > 0) {
+      postMessage({
+        id: e.data.id,
+        result: FinalResult,
+        success: true
+      });
+    } else {
+      postMessage({
+        id: e.data.id,
+        result: FinalResult,
+        success: false
+      });
+    }
+  });
+
 };
 
